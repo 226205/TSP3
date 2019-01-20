@@ -7,7 +7,7 @@
 #include <ctime>
 
 
-int cityamount=0;
+int cityamount = 0;
 int **distances;
 bool divers = true;
 
@@ -16,7 +16,7 @@ void chosingfile();
 bool fileread(std::string);
 void writetab(int**);
 void menu();
-int genetical();
+int genetical(int, int, int, int, char, char, int, int);
 
 
 int  main()
@@ -97,9 +97,9 @@ void writetab(int** cities)
 
 void menu()
 {
-    int kstropu = 1;
+    int kstropu = '1';
     int maxiteracja = 1000;
-    int ttime = 10;
+    int ttime = 4;
     int wlkpopulacji = 50;
     char mkrzyzowania = '1';
     char mmutacji = '1';
@@ -133,6 +133,7 @@ void menu()
         std::cout << "\n8. Ustaw Wielkosc Populacji";
         std::cout << "\n9: Algorytm Genetyczny";
         std::cout << "\n0. Wyjscie ";
+        std::cout << "\n\nt. Wielokrotne Testowanie Algorytmu";
         std::cout << "\nTwoj wybor: ";
 
         choice = getche();
@@ -234,8 +235,21 @@ void menu()
         }
         case '9':
         {
-            std::cout << "\n\n " << genetical();
+
+            std::cout << "\n\n " << genetical(kstropu, maxiteracja, ttime, wlkpopulacji, mkrzyzowania, mmutacji, wspkrzyzowania, wspmutacji);
             break;
+        }
+        case 't':
+        {
+            int testin = 0;
+            do{
+                std::cout << "\n\n Wielokrotne testowanie algorytmu, podaj ilosc prob: ";
+                std::cin >> testin;
+                if(testin <= 0) std::cout << "\n liczba prob musi byc wieksza od zera! Sprobuj ponownie!";
+            }while(testin <= 0);
+
+            for(int k = 0; k < testin; k++)
+                std::cout << "\n\n " << genetical(kstropu, maxiteracja, ttime, wlkpopulacji, mkrzyzowania, mmutacji, wspkrzyzowania, wspmutacji);
         }
         case '0':
             break;
@@ -248,8 +262,50 @@ void menu()
     }
 }
 
-int genetical()
+int genetical(int kstropu, int maxiteracja, int ttime, int wlkpopulacji, char mkrzyzowania, char mmutacji, int wspkrzyzowania, int wspmutacji)
 {
-    int bestCost = 0;
+//    std::cout << "\n" <<  kstropu;
+//    std::cout << "\n" <<  maxiteracja;
+//    std::cout << "\n" <<  ttime;
+//    std::cout << "\n" <<  wlkpopulacji;
+//    std::cout << "\n" <<  mkrzyzowania;
+//    std::cout << "\n" <<  mmutacji;
+//    std::cout << "\n" <<  wspkrzyzowania;
+//    std::cout << "\n" <<  wspmutacji;
+
+    int bestCost = INT_MAX;
+    int iteracja = 0;
+    bool robdalej = true;
+    clock_t begin = clock();
+    std::clock_t end = clock();
+
+    
+
+    do
+    {
+        iteracja++;
+
+
+
+
+
+
+
+
+        end = clock();
+        if(kstropu == '1' && double(end - begin) / CLOCKS_PER_SEC > ttime || kstropu == '3' && double(end - begin) / CLOCKS_PER_SEC > ttime)
+            {robdalej = false;
+            std::cout << " warunek czasu " << iteracja;
+            }
+        if(kstropu == '2' && iteracja >= maxiteracja || kstropu == '3' && iteracja >= maxiteracja)
+            {robdalej = false;
+            std::cout << " warunek iteracji " << iteracja;
+            }
+    }
+    while(robdalej == true);
+
+    std::cout<<"\n\n\nCzas wykonania proby: " << double(end - begin) / CLOCKS_PER_SEC;
+
+
     return bestCost;
 }
