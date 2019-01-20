@@ -1,7 +1,12 @@
+// Dodatkowe rzeczy:
+//- pierwsze 1/3 sekwencji miast jest generowana losowo, reszta za pomocą Greedy
+
+
 #include <fstream>
 #include <iostream>
 #include <conio.h>
 #include <cmath>
+#include <math.h>
 #include <queue>
 #include <vector>
 #include <ctime>
@@ -97,10 +102,10 @@ void writetab(int** cities)
 
 void menu()
 {
-    int kstropu = '1';
-    int maxiteracja = 1000;
+    int kstopu = '2';
+    int maxiteration = 1000;
     int ttime = 4;
-    int wlkpopulacji = 50;
+    int popSize = 50;
     char mkrzyzowania = '1';
     char mmutacji = '1';
     int wspkrzyzowania = 80;
@@ -110,9 +115,9 @@ void menu()
     while(choice != '0')
     {
         std::cout << "\n\n\n Aktualnie ustawione parametry programu: ";
-        if(kstropu == '1' || kstropu == '3') std::cout << "\n Czas jednego wykonania algorytmu (w sekundach): " << ttime;
-        if(kstropu == '3') std::cout << " lub gdy sie wykona";
-        if(kstropu == '2' || kstropu == '3') std::cout << "\n maskymalna ustawiona liczba iteracji: " << maxiteracja;
+        if(kstopu == '1' || kstopu == '3') std::cout << "\n Czas jednego wykonania algorytmu (w sekundach): " << ttime;
+        if(kstopu == '3') std::cout << " lub gdy sie wykona";
+        if(kstopu == '2' || kstopu == '3') std::cout << "\n maskymalna ustawiona liczba iteracji: " << maxiteration;
         if(mkrzyzowania == '1') std::cout << "\n Metoda krzyzowania: OX";
         if(mkrzyzowania == '2') std::cout << "\n Metoda krzyzowania: PMX";
         std::cout << "\n Wspolczynnik krzyzowania: " << wspkrzyzowania;
@@ -120,7 +125,7 @@ void menu()
         if(mmutacji == '2') std::cout << "\n Metoda mutacji: invert";
         if(mmutacji == '3') std::cout << "\n Metoda mutacji: swap";
         std::cout << "\n Wspolczynnik mutacji: " << wspmutacji;
-        std::cout << "\n Wielkosc populacji: " << wlkpopulacji;
+        std::cout << "\n Wielkosc populacji: " << popSize;
 
         std::cout << "\n\n Wybierz opcje do rozwiazania TSP:";
         std::cout << "\n1. Wybierz nowy plik z danymi";
@@ -162,23 +167,23 @@ void menu()
                 std::cout << "\n 2. Okreslona ilosc iteracji";
                 std::cout << "\n 3. Oba powyzsze";
                 std::cout << "\n Twoj wybor: ";
-                kstropu = getche();
-                if(kstropu == '1' || kstropu == '3')
+                kstopu = getche();
+                if(kstopu == '1' || kstopu == '3')
                     do
                     {
                         std::cout << "\n\n Podaj czas wykonywania algorytmu (w sekundach): ";
                         std::cin >> ttime;
                         if(ttime <= 0) std::cout << "\n Czas wykonywania musi byc wiekszy od zera! Sprobuj ponownie!";
                     }while(ttime <=0);
-                if(kstropu == '2' || kstropu == '3')
+                if(kstopu == '2' || kstopu == '3')
                     do
                     {
                         std::cout << "\n\n Podaj maksymalna liczbe iteracji programu: ";
-                        std::cin >> maxiteracja;
-                        if(maxiteracja <= 0) std::cout << "\n Liczba iteracji musi byc wieksza od zera! Sprobuj ponownie!";
-                    }while(maxiteracja <= 0);
-                if(kstropu != '1' && kstropu != '2' && kstropu != '3') std::cout << "\n\n Sprobuj jeszcze raz wybrac warunek zakonczenia dzialania algorytmu!";
-            } while (kstropu != '1' && kstropu != '2' && kstropu != '3');
+                        std::cin >> maxiteration;
+                        if(maxiteration <= 0) std::cout << "\n Liczba iteracji musi byc wieksza od zera! Sprobuj ponownie!";
+                    }while(maxiteration <= 0);
+                if(kstopu != '1' && kstopu != '2' && kstopu != '3') std::cout << "\n\n Sprobuj jeszcze raz wybrac warunek zakonczenia dzialania algorytmu!";
+            } while (kstopu != '1' && kstopu != '2' && kstopu != '3');
             break;
         }
         case '4':
@@ -211,16 +216,16 @@ void menu()
             } while (mkrzyzowania != '1' && mkrzyzowania != '2');
             break;
         }
-        case '7':
+        case '8':
         {
             do {
                 std::cout << "\n\n Podaj wielkosc populacji (zakres testowy: 10 - 500): ";
-                std::cin >> wlkpopulacji;
-                if(wlkpopulacji < 10 || wlkpopulacji > 500) std::cout << "\n Wielkosc nie miesci sie w zakresie! Sprobuj ponownie!";
-            } while (wlkpopulacji < 10 || wlkpopulacji > 500);
+                std::cin >> popSize;
+                if(popSize < 10 || popSize > 500) std::cout << "\n Wielkosc nie miesci sie w zakresie! Sprobuj ponownie!";
+            } while (popSize < 10 || popSize > 500);
             break;
         }
-        case '8':
+        case '7':
         {
             do {
                 std::cout << "\n\n Wybierz metode mutacji z ponizszych: ";
@@ -236,7 +241,7 @@ void menu()
         case '9':
         {
 
-            std::cout << "\n\n " << genetical(kstropu, maxiteracja, ttime, wlkpopulacji, mkrzyzowania, mmutacji, wspkrzyzowania, wspmutacji);
+            std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, mkrzyzowania, mmutacji, wspkrzyzowania, wspmutacji);
             break;
         }
         case 't':
@@ -249,10 +254,15 @@ void menu()
             }while(testin <= 0);
 
             for(int k = 0; k < testin; k++)
-                std::cout << "\n\n " << genetical(kstropu, maxiteracja, ttime, wlkpopulacji, mkrzyzowania, mmutacji, wspkrzyzowania, wspmutacji);
+                std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, mkrzyzowania, mmutacji, wspkrzyzowania, wspmutacji);
         }
         case '0':
+        {
+            for(int i=0;i<cityamount;++i)        // zwolnij pamiec
+                delete[] distances[i];
+            delete[] distances;
             break;
+        }
         default:
             {
             std::cout << " \nZly wybor, sprobuj ponownie";
@@ -262,28 +272,82 @@ void menu()
     }
 }
 
-int genetical(int kstropu, int maxiteracja, int ttime, int wlkpopulacji, char mkrzyzowania, char mmutacji, int wspkrzyzowania, int wspmutacji)
+int genetical(int kstopu, int maxiteration, int ttime, int popSize, char mkrzyzowania, char mmutacji, int wspkrzyzowania, int wspmutacji)
 {
-//    std::cout << "\n" <<  kstropu;
-//    std::cout << "\n" <<  maxiteracja;
+//    std::cout << "\n" <<  kstopu;
+//    std::cout << "\n" <<  maxiteration;
 //    std::cout << "\n" <<  ttime;
-//    std::cout << "\n" <<  wlkpopulacji;
+//    std::cout << "\n" <<  popSize;
 //    std::cout << "\n" <<  mkrzyzowania;
 //    std::cout << "\n" <<  mmutacji;
 //    std::cout << "\n" <<  wspkrzyzowania;
 //    std::cout << "\n" <<  wspmutacji;
 
     int bestCost = INT_MAX;
-    int iteracja = 0;
-    bool robdalej = true;
+    std::cout << "\n " << bestCost;
+    int iteration = 0;
+    bool keepGoing = true;
     clock_t begin = clock();
     std::clock_t end = clock();
 
-    
+    int amountOfRandom = std::max(cityamount / 3, 3);
+    int tempR, tempV, temp, fA, tA;
+    std::cout << "\n\n" << amountOfRandom << "\n\n";
+
+    int* specimenValue = new int[popSize];
+    for(int i = 0; i < popSize; i++)
+        specimenValue[i] = 0;
+
+    bool* visited = new bool[cityamount + 1];            //stworzenie tablicy mowiacej czy dana liczba juz wystapila w sekwencji
+    visited[0] = visited[cityamount] = true;              //podpisanie pierwszego i ostatniego elementu jako juz wykonanego
+
+    int** specimenP = new int* [popSize];               // dwuwymiarowa tablica dynamiczna okreslajaca sciezki osobnikow
+    for(int i = 0; i < popSize; ++i)
+    {
+        specimenP[i] = new int[cityamount + 1];
+        specimenP[i][0] = specimenP[i][cityamount] = 0;     //ustawienie pierwszego miasta jako poczatkowego i koncowego
+//        int calculated = 0;
+
+        for(int j = 1; j < cityamount; j++)                 //podpisanie miast jako niewykorzystanych w sciezce
+            visited[j] = false;
+
+        for (int j = 1; j < amountOfRandom; j++){               //wykonywanie kolejnych miejsc sekwencji w losowy sposób
+            fA = tA = 0;
+            tempR = (rand() % (cityamount - j)) + 1;        //tempR przyjmuje wartosc losowa z zakresu od 1 do ilosci miejsc pozostalych do zapisu
+            for(int p = 1; fA < tempR; p++){                //wykonanie petli tak dlugo, az znajdziemy tyle miejsc nieprzypisanych ile chce nasza wartosc tempR
+                if(visited[p] == false)                      //jesli wartosc jeszcze nie wystapila to zwiekszamy falseAmount, potrzebna nam jest wartosc liczby z randa
+                    fA++;
+                else                                        //jesli wartosc juz wystapila to zwiekszamy trueAmount, musimy wiedziec ile liczb skipowalismy aby dodac potem ta ilosc do wpisywanej liczby
+                    tA++;
+            }
+
+            visited[tempR + tA] = true;                      //wpisanie liczby do sekwencji oraz oznaczenie jej jako wykorzystanej
+            specimenP[i][j] = tempR + tA;
+            specimenValue[i] += distances[specimenP[i][j-1]][specimenP[i][j]];
+//            calculated++;
+        }
+        for(int j = amountOfRandom; j < cityamount; j++)        //GreedyAlgoritm
+        {
+            tempV = INT_MAX;
+            for(int p = 1; p < cityamount; p++)
+                if(visited[p] == false && distances[specimenP[i][j-1]][p] < tempV){
+                    tempV = distances[specimenP[i][j-1]][p];
+                    temp = p;
+                }
+            visited[temp] = true;
+            specimenP[i][j] = temp;
+            specimenValue[i] += distances[specimenP[i][j-1]][specimenP[i][j]];
+//            calculated++;
+        }
+        specimenValue[i] += distances[specimenP[i][cityamount - 1]][specimenP[i][cityamount]];
+//            std::cout << "\n\n nr liczby w sekwencji: " << i << "\n calculated: " << calculated + 1 << "\n distance: " << specimenValue[i] << "\nsequence of visit: ";
+//            for(int u = 0; u <= cityamount; u++)
+//                std::cout << " " << specimenP[i][u];
+    }
 
     do
     {
-        iteracja++;
+        iteration++;
 
 
 
@@ -293,19 +357,23 @@ int genetical(int kstropu, int maxiteracja, int ttime, int wlkpopulacji, char mk
 
 
         end = clock();
-        if(kstropu == '1' && double(end - begin) / CLOCKS_PER_SEC > ttime || kstropu == '3' && double(end - begin) / CLOCKS_PER_SEC > ttime)
-            {robdalej = false;
-            std::cout << " warunek czasu " << iteracja;
+        if(kstopu == '1' && double(end - begin) / CLOCKS_PER_SEC > ttime || kstopu == '3' && double(end - begin) / CLOCKS_PER_SEC > ttime)
+            {keepGoing = false;
+            std::cout << "\n warunek czasu " << iteration;
             }
-        if(kstropu == '2' && iteracja >= maxiteracja || kstropu == '3' && iteracja >= maxiteracja)
-            {robdalej = false;
-            std::cout << " warunek iteracji " << iteracja;
+        if(kstopu == '2' && iteration >= maxiteration || kstopu == '3' && iteration >= maxiteration)
+            {keepGoing = false;
+            std::cout << "\n warunek iteracji " << iteration;
             }
     }
-    while(robdalej == true);
+    while(keepGoing);
 
     std::cout<<"\n\n\nCzas wykonania proby: " << double(end - begin) / CLOCKS_PER_SEC;
 
+    delete[] visited;
+    for(int i = 0; i < popSize; ++i)        // zwolnij pamiec
+        delete[] specimenP[i];
+    delete[] specimenP;
 
     return bestCost;
 }
