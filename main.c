@@ -1,8 +1,9 @@
 // Dodatkowe rzeczy:
 //- pierwsze 1/3 sekwencji miast jest generowana losowo, reszta za pomocą Greedy
-//- 3 metody selekcji
+//- 2 metody selekcji rodzicow
 //- 3 metody krzyzowania
-//- 3 metody mutacji
+//- 4 metody mutacji
+//- 3 metody selekcji osobnikow
 
 #include <fstream>
 #include <iostream>
@@ -105,10 +106,10 @@ void writetab(int** cities)
 void menu()
 {
     int kstopu = '2';
-    int maxiteration = 1;
+    int maxiteration = 100;
     int ttime = 4;
-    int popSize = 10;
-    int popChild = 3;
+    int popSize = 60;
+    int popChild = 20;
     char mkrzyzowania = '2';
     char mmutacji = '3';
     char mselekcji = '1';
@@ -321,7 +322,6 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //    std::cout << "\n" <<  wspmutacji;
 
     int bestCost = INT_MAX;
-    std::cout << "\n " << bestCost;
     int iteration = 0;
     bool keepGoing = true;
     clock_t begin = clock();
@@ -329,9 +329,10 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
     int specimenMaxValue = 0;
 
     int amountOfRandom = std::max(cityamount / 3, 3);
-    int tempR, tempV, temp, fA, tA, allPaths, tmp, tmp2, k1, k2;
+    int tempR, tempV, temp, fA, tA, allPaths, tmp, tmp2, k1, k2, titu;
 //    std::cout << "\n\n" << amountOfRandom << "\n\n";
     int* pOperator = new int[cityamount + 1];
+    int* bestPath = new int[cityamount + 1];
     int* specimenValue = new int[popSize];
     for(int i = 0; i < popSize; i++)
         specimenValue[i] = 0;
@@ -357,7 +358,6 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
     {
         oldGeneration[i] = new int[cityamount + 1];
         oldGeneration[i][0] = oldGeneration[i][cityamount] = 0;     //ustawienie pierwszego miasta jako poczatkowego i koncowego
-//        int calculated = 0;
 
         for(int j = 1; j < cityamount; j++)                 //podpisanie miast jako niewykorzystanych w sciezce
             visited[j] = false;
@@ -375,7 +375,6 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
             visited[tempR + tA] = true;                      //wpisanie liczby do sekwencji oraz oznaczenie jej jako wykorzystanej
             oldGeneration[i][j] = tempR + tA;
 //            specimenValue[i] += distances[oldGeneration[i][j-1]][oldGeneration[i][j]];
-//            calculated++;
         }
         for(int j = amountOfRandom; j < cityamount; j++)        //GreedyAlgoritm
         {
@@ -388,7 +387,6 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
             visited[temp] = true;
             oldGeneration[i][j] = temp;
 //            specimenValue[i] += distances[oldGeneration[i][j-1]][oldGeneration[i][j]];
-//            calculated++;
         }
 //        specimenValue[i] += distances[oldGeneration[i][cityamount - 1]][0];
         specimenValue[i] = 0;
@@ -396,9 +394,16 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
             specimenValue[i] += distances[oldGeneration[i][j]][oldGeneration[i][j+1]];
 //            std::cout << "\n Przejscie z " << oldGeneration[i][j] << " do " << oldGeneration[i][j + 1] << " generuje: " << distances[oldGeneration[i][j]][oldGeneration[i][j+1]];
         }
-            std::cout << "\n\n nr liczby w sekwencji: " << i << "\n distance: " << specimenValue[i] << "\nsequence of visit: ";
-            for(int u = 0; u <= cityamount; u++)
-                std::cout << " " << oldGeneration[i][u];
+
+        if(specimenValue[i] < bestCost)
+        {
+            bestCost = specimenValue[i];
+            for(int j = 0; j <= cityamount; j++)
+                bestPath[j] = oldGeneration[i][j];
+        }
+//            std::cout << "\n\n nr liczby w sekwencji: " << i << "\n distance: " << specimenValue[i] << "\nsequence of visit: ";
+//            for(int u = 0; u <= cityamount; u++)
+//                std::cout << " " << oldGeneration[i][u];
 
     }
 
@@ -406,18 +411,24 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
     {
         iteration++;
 
+        std::cout << "\n switch: " << iteration;
         switch(mrodzica){
 
             case '1':{  //kola ruletki
-                allPaths = 0;
+                allPaths = titu = 0;
 
                 for(int i = 0; i < popSize; i++)            //znajdowanie najdluzszej sciezki w populacji
                     if(specimenValue[i] > specimenMaxValue)
                         specimenMaxValue = specimenValue[i];
-//            std::cout << "\n sValue: " << specimenValue[i] << "  sMax: " << specimenMaxValue;
+//                std::cout << "\n sMax: " << specimenMaxValue;
 
-                for(int i = 0; i < popSize; i++)            //obliczanie szansy na rozmnozenie na podstawie wartosci o ktora jest osobnik lepszy od najgorszej sciezki
+                titu += (specimenMaxValue * popSize) + popSize;
+                for(int i = 0; i < popSize; i++){            //obliczanie szansy na rozmnozenie na podstawie wartosci o ktora jest osobnik lepszy od najgorszej sciezki
+                    titu -= specimenValue[i];
                     allPaths += (specimenMaxValue - specimenValue[i] + 1);
+                }
+
+                std::cout << "\n maxVal: " << specimenMaxValue << "  allpaths: " << allPaths << "  titu: " << titu;
 
                 for(int i = 0; i < popChild; i++){           //stworzenie wartosci bedacej suma wszystkich mozliwych szans dla osobnikow na
                                                             // zostanie rodzicami (bycie lepszym od najgorszego o dana wartosc +1). nastepuje
@@ -426,7 +437,16 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                     for(int j = 0; tmp2 < tmp; j++)
                     {
                         tmp2 += (specimenMaxValue - specimenValue[j] + 1);
-                        if(tmp2 >= tmp) newParents[i][0] = j;
+                        if(tmp2 >= tmp){
+                            newParents[i][0] = j;
+                            std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2;
+                        }
+                    }
+                    if(tmp2 > tmp + 10000){     //sprawdzenie
+                        std::cout << "\n";
+                        for(int w = 0; w <= cityamount; w++)
+                            std::cout << " " << oldGeneration[i][w];
+                        std::cout << " value: " << specimenValue;
                     }
 
                     tmp = rand() % (allPaths - specimenValue[newParents[i][0]] - 1);
@@ -435,24 +455,39 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                     {
                         if(j == newParents[i][0]) j++;
                         tmp2 += (specimenMaxValue - specimenValue[j] + 1);
-                        if(tmp2 >= tmp) newParents[i][1] = j;
+                        if(tmp2 >= tmp){
+                            newParents[i][1] = j;
+                            std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2;
+                        }
                     }
+                    if(tmp2 > tmp + 10000){     //sprawdzenie
+                        std::cout << "\n";
+                        for(int w = 0; w <= cityamount; w++)
+                            std::cout << " " << oldGeneration[i][w];
+                        std::cout << " value: " << specimenValue;
+                    }
+
+                    if(newParents[i][1] >= popSize || newParents[i][0] >= popSize)
+                        std::cout << "\n\n POPSULEM \n\n";
                 }
 //                for(int i = 0; i< popChild; i++)
 //                    std::cout << "\n parent: " << newParents[i][0] << " " << newParents[i][1];
-
                 break;
             }
             case '2':{  //losowa
                 for(int i = 0; i < popChild; i++)
                 {
-                    newParents[i][0] = rand() % popChild;
-                    newParents[i][1] = rand() % (popChild - 1);
+                    newParents[i][0] = rand() % popSize;
+                    newParents[i][1] = rand() % (popSize - 1);
                     if(newParents[i][0] <= newParents[i][1])
                         newParents[i][1]++;
+
+                    if(newParents[i][1] >= popSize || newParents[i][0] >= popSize)
+                        std::cout << "\n\n\n\n\n\n POPSULEM \n\n\n\n\n\n";
+
                 }
-                for(int i = 0; i< popChild; i++)
-                    std::cout << "\n parent: " << newParents[i][0] << " " << newParents[i][1];
+//                for(int i = 0; i< popChild; i++)
+//                    std::cout << "\n parent: " << newParents[i][0] << " " << newParents[i][1];
                 break;
             }
 //            case '3':{  //
@@ -460,65 +495,91 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //                break;
 //            }
         }
-
+        std::cout << "\n krzyzowanie: " << iteration;
         switch(mkrzyzowania){
             case '1':{  //OX
 
                 break;
             }
             case '2':{  //PMX
+//                std::cout << "\n\nPMX\n\n";
+//
+//                for(int i = 0; i < popSize; i++){
+//                    for(int u = 0; u <= cityamount; u++)
+//                        std::cout << " " << oldGeneration[i][u];
+//                    std::cout << "  osobnik nr: " << i << "\n";}
+//
+//                for(int i = 0; i < popChild; i++){
+//                    for(int u = 0; u <= cityamount; u++)
+//                        std::cout << " " << newGeneration[i][u];
+//                    std::cout << "  osobnik nr: " << i << "\n";}
+
                 for(int i = 0; i < popChild; i++)
                 {
                     k1 = rand() % (cityamount - 1) + 1;
                     k2 = rand() % (cityamount - 1) + 1;
                     if(k1 > k2){
-                        tmp = k1;
+                        temp = k1;
                         k1 = k2;
-                        k2 = tmp;
+                        k2 = temp;
                     }
                     for(int j = 1; j < cityamount; j++){
                         visited[j] = false;
                         pOperator[j] = 0;
                     }
-
                     for(int j = k1; j <= k2; j++){
                         newGeneration[i][j] = oldGeneration[newParents[i][0]][j];
-                        visited[newGeneration[i][j]] = true;
+                        visited[oldGeneration[newParents[i][0]][j]] = true;
                     }
 
                     tmp = 0;
-                    for(int j = k1; j <= k2; j++)      //sprawdzamy te same co przeniesione tylko z p2
-                        if(visited[oldGeneration[newParents[i][1]][j]] == false){     //sprawdzenie ktore z wierzcholkow rodzica2 z tego przedzialu nie zostaly uzyte przy krzyzowaniu do potomka
+//                    std::cout << "\nt3: " << tmp << "   rodzic: " << newParents[i][1] << "\n";
+                    for(int j = k1; j <= k2; j++){      //sprawdzamy te same co przeniesione tylko z p2
+//                        std::cout << "." << j;
+                        tempV = oldGeneration[newParents[i][1]][j];
+//                        std::cout << "p";
+                        if(visited[tempV] == false){     //sprawdzenie ktore z wierzcholkow rodzica2 z tego przedzialu nie zostaly uzyte przy krzyzowaniu do potomka
+//                            std::cout << "k";
                             pOperator[j] = oldGeneration[newParents[i][1]][j];
                             tmp++;
                         }
-//                    std::cout << "\n\n WEJSCIOWY TMP: " << tmp << "\n\n";
-//                    for(int j = 1; j < cityamount; j++)
+                    }
 
+//                    std::cout << "\n\n WEJSCIOWY TMP: " << tmp << "\n\n";
+//                    for(int u = 0; u <= cityamount; u++)
+//                        std::cout << " " << newGeneration[i][u];
+//                    std::cout << "  - odwedzone miasta w potomku\n";
+//                    for(int u = 0; u <= cityamount; u++)
+//                        std::cout << " " << pOperator[u];
+//                    std::cout << "  - pOperator\n\n";
+
+//                    std::cout << "\n tmp: " << tmp << " iteracja i: " << i;
                     tmp2 = 1;
-                    while(tmp)
-                    {
+                    while(tmp > 0)
+                    {   /*std::cout << "PMX4";*/
                         if(pOperator[tmp2] != 0)
                             for(int j = 1; j < cityamount; j++)
                                 if(oldGeneration[newParents[i][0]][tmp2] == oldGeneration[newParents[i][1]][j] && pOperator[j] == 0)
                                 {
-//                                    std::cout <<"\n WSZEDLEM!, j: " << j << "  vNgen: " << visited[newGeneration[i][j]];
+//                                    std::cout <<" j: " << j;
                                     pOperator[j] = pOperator[tmp2];
                                     pOperator[tmp2] = 0;
                                     if(newGeneration[i][j] == 0)
                                     {
 //                                        std::cout <<"\n WSZEDLEM222!";
                                         newGeneration[i][j] = pOperator[j];
-//                                        visited[newGeneration[i][j]] == true;
                                         tmp--;
                                         pOperator[j] = 0;
                                     }
                                 }
-//                        std::cout << "\n tmp: " << tmp << "  tmp2: " << tmp2 << "  pOperator: " << pOperator[tmp2];
+//                        std::cout << " tmp: " << tmp << "  tmp2: " << tmp2 << "  pOperator: " << pOperator[tmp2] << "\n";
                         tmp2++;
-                        if(tmp2 == cityamount) tmp2 = 1;
+                        if(tmp2 == cityamount)
+                            tmp2 = 1;
                     }
-//
+
+//                    std::cout << "\n\n KONIECPMX\n\n";
+
 //                    for(int u = 0; u <= cityamount; u++)
 //                        std::cout << " " << newGeneration[i][u];
 //                    std::cout << "  -potomek1\n";
@@ -544,7 +605,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //                    std::cout << " " << pOperator[u];
 
                 }
-
+                std::cout << "\nkrzyzowaniewyjsciepmx: " << iteration;
                 break;
             }
             case '3':{  //HX
@@ -574,13 +635,44 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
         }
 
-        for(int i = 0; i < popChild; i++){
+//        for(int i = 0; i < popSize; i++){
+//            for(int u = 0; u <= cityamount; u++)
+//                std::cout << " " << oldGeneration[i][u];
+//            std::cout << "  osobnik nr: " << i << "  droga: " << specimenValue[i] << "\n";}
+//
+//        for(int i = 0; i < popChild; i++){
+//            for(int u = 0; u <= cityamount; u++)
+//                std::cout << " " << newGeneration[i][u];
+//            std::cout << "  osobnik nr: " << i << "  droga: " << childValue[i] << "\n";}
+
+
+        for(int i = 0; i < popChild; i++){          //obliczanie drogi potomkow
             childValue[i] = 0;
             for(int j = 0; j < cityamount; j++)
                 childValue[i] += distances[newGeneration[i][j]][newGeneration[i][j + 1]];
-            std::cout << "\n\n dziecko " << i << " ma droge rowna " << childValue[i];
+            if(childValue[i] < bestCost)
+            {
+                bestCost = childValue[i];
+                for(int j = 0; j <= cityamount; j++)
+                    bestPath[j] = newGeneration[i][j];
+            }
+//            std::cout << "\n\n dziecko " << i << " ma droge rowna " << childValue[i];
+
+            if(newParents[i][1] >= popSize || newParents[i][0] >= popSize)
+                std::cout << "\n\n ZWARIOWALEM \n\n";
         }
 
+//        for(int i = 0; i < popSize; i++){
+//            for(int u = 0; u <= cityamount; u++)
+//                std::cout << " " << oldGeneration[i][u];
+//            std::cout << "  osobnik nr: " << i << "  droga: " << specimenValue[i] << "\n";}
+//
+//        for(int i = 0; i < popChild; i++){
+//            for(int u = 0; u <= cityamount; u++)
+//                std::cout << " " << newGeneration[i][u];
+//            std::cout << "  osobnik nr: " << i << "  droga: " << childValue[i] << "\n";}
+
+        std::cout << "\n selekcja: " << iteration;
 
         switch(mselekcji){
             case '1':{  //kola ruletki
@@ -593,24 +685,29 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                     if(childValue[i] < specimenMaxValue)
                         specimenMaxValue = childValue[i];
 
+//                std::cout << "\n\n mvalue" << specimenMaxValue;
 
                 for(int i = 0; i < popSize; i++)            //obliczanie szansy na rozmnozenie na podstawie wartosci o ktora jest osobnik gorszy od najlepszej sciezki
                     allPaths += (specimenValue[i] - specimenMaxValue + 1);
                 for(int i = 0; i < popChild; i++)
                     allPaths += (childValue[i] - specimenMaxValue + 1);
 
+//                std::cout << "\n\n allpaths" << allPaths;
+
                 for(int i = 0; i < popChild; i++){           //stworzenie wartosci bedacej suma wszystkich mozliwych szans dla osobnikow na
                                                             // zostanie rodzicami (bycie lepszym od najgorszego o dana wartosc +1). nastepuje
                     tmp = rand() % allPaths;                // wylosowanie wartosci a nastepnie jest sprawdzane w ktorym osobniku znajduje sie wylosowana
-                    tmp2 = 0;
-                    std::cout << "\n allpaths: " << allPaths;   // szansa. Nastepnie jego wartosc jest odejmowana z puli i losuje sie jeszcze raz z jego pominieciem
+                    tmp2 = 0;                               // szansa. Nastepnie jego wartosc jest odejmowana z puli i losuje sie jeszcze raz z jego pominieciem
+//                    std::cout << "\n allpaths: " << allPaths;
                     for(int j = 0; j < popSize && tmp2 < tmp; j++)
-                    {  std::cout << "\n\n SPRAWDZAM: " << j << "  tmp: " << tmp << "\n\n";                                      //sprawdzenie starej populacji, potem nowej
+                    {                                    //sprawdzenie starej populacji, potem nowej
                         if(oldGeneration[j][0] != -1){      // w wypadku odrzucania osobnika ustawiamy jego pole startowe na -1
                             tmp2 += (specimenValue[j] - specimenMaxValue + 1);
                             if(tmp2 >= tmp){
                                 oldGeneration[j][0] = -1;
+//                                std::cout << "\n odejmowane oldgen: " << (specimenValue[j] - specimenMaxValue + 1);
                                 allPaths -= (specimenValue[j] - specimenMaxValue + 1);
+//                                std::cout << "\n allpaths: " << allPaths;
                             }
                         }
                     }
@@ -620,7 +717,9 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                             tmp2 += (childValue[j] - specimenMaxValue + 1);
                             if(tmp2 >= tmp){
                                 newGeneration[j][0] = -1;
+//                                std::cout << "\n odejmowane dziecka: " << (childValue[j] - specimenMaxValue + 1);
                                 allPaths -= (childValue[j] - specimenMaxValue + 1);
+//                                std::cout << "\n allpaths: " << allPaths;
                             }
                         }
                     }
@@ -637,6 +736,47 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
             }
         }
 
+//        std::cout << "\n\n check out";
+
+        tmp = 0;
+        for(int i = 0; i < popChild; i++)       //nadpisywanie wylosowanych oldGen nowymi osobnikami
+        {
+//            std::cout << "\n  -potomek: ";
+//            for(int u = 0; u <= cityamount; u++)
+//                std::cout << " " << newGeneration[i][u];
+
+            if(newGeneration[i][0] == 0)
+                do{
+//                    std::cout << "\n  -rodzic: ";
+//                    for(int u = 0; u <= cityamount; u++)
+//                        std::cout << " " << oldGeneration[tmp][u];
+
+                    if(oldGeneration[tmp][0] == -1)
+                    {
+                        for(int u = 0; u <= cityamount; u++)
+                        {
+                            oldGeneration[tmp][u] = newGeneration[i][u];
+                            newGeneration[i][u] = 0;
+                        }
+                        specimenValue[tmp] = childValue[i];
+                        childValue[i] = 0;
+                    }
+                    tmp++;
+                }while(childValue[i] != 0);
+            else
+            {
+                for(int j = 0; j <= cityamount; j++)
+                    newGeneration[i][j] = 0;
+                childValue[i] = 0;
+            }
+        }
+
+//                    std::cout << "\n\n wykonane\n nowa generacja:\n";
+//                    for(int i = 0; i < popSize; i++){
+//                        std::cout << "\n droga: " << specimenValue[i] << "  sciezka: ";
+//                        for(int u = 0; u <= cityamount; u++)
+//                            std::cout << " " << oldGeneration[i][u];
+//                    }
 
 //przenies nowa gen na miejsce starej i wykonaj obliczenie dla allPaths i pozostalych wymaganych wartosci
 
@@ -659,6 +799,9 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //                    std::cout << " " << newGeneration[y][u];}
 
     std::cout<<"\n\n\nCzas wykonania proby: " << double(end - begin) / CLOCKS_PER_SEC;
+    std::cout<<"\nNajlepszy wynik proby: " << bestCost << "\nNajlepsza sciezka: ";
+    for(int i = 0; i <= cityamount; i++)
+        std::cout << " " << bestPath[i];
 
     delete[] visited;
     for(int i = 0; i < popSize; i++)        // zwolnij pamiec
@@ -672,6 +815,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
     delete[] newParents[0];
     delete[] newParents[1];
     delete[] pOperator;
+    delete[] bestPath;
 
     return bestCost;
 }
