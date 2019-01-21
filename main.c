@@ -329,7 +329,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
     int specimenMaxValue = 0;
 
     int amountOfRandom = std::max(cityamount / 3, 3);
-    int tempR, tempV, temp, fA, tA, allPaths, tmp, tmp2, k1, k2, titu;
+    int tempR, tempV, temp, fA, tA, allPaths, tmp, tmp2, k1, k2, x;
 //    std::cout << "\n\n" << amountOfRandom << "\n\n";
     int* pOperator = new int[cityamount + 1];
     int* bestPath = new int[cityamount + 1];
@@ -415,63 +415,65 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
         switch(mrodzica){
 
             case '1':{  //kola ruletki
-                allPaths = titu = 0;
+                allPaths = 0;
 
                 for(int i = 0; i < popSize; i++)            //znajdowanie najdluzszej sciezki w populacji
                     if(specimenValue[i] > specimenMaxValue)
                         specimenMaxValue = specimenValue[i];
 //                std::cout << "\n sMax: " << specimenMaxValue;
 
-                titu += (specimenMaxValue * popSize) + popSize;
-                for(int i = 0; i < popSize; i++){            //obliczanie szansy na rozmnozenie na podstawie wartosci o ktora jest osobnik lepszy od najgorszej sciezki
-                    titu -= specimenValue[i];
+                for(int i = 0; i < popSize; i++)            //obliczanie szansy na rozmnozenie na podstawie wartosci o ktora jest osobnik lepszy od najgorszej sciezki
                     allPaths += (specimenMaxValue - specimenValue[i] + 1);
-                }
 
-                std::cout << "\n maxVal: " << specimenMaxValue << "  allpaths: " << allPaths << "  titu: " << titu;
+                std::cout << "\n maxVal: " << specimenMaxValue << "  allpaths: " << allPaths;
 
-                for(int i = 0; i < popChild; i++){           //stworzenie wartosci bedacej suma wszystkich mozliwych szans dla osobnikow na
-                                                            // zostanie rodzicami (bycie lepszym od najgorszego o dana wartosc +1). nastepuje
-                    tmp = rand() % allPaths;                // wylosowanie wartosci a nastepnie jest sprawdzane w ktorym osobniku znajduje sie wylosowana
-                    tmp2 = 0;                               // szansa. Nastepnie jego wartosc jest odejmowana z puli i losuje sie jeszcze raz z jego pominieciem
-                    for(int j = 0; tmp2 < tmp; j++)
-                    {
-                        tmp2 += (specimenMaxValue - specimenValue[j] + 1);
-                        if(tmp2 >= tmp){
-                            newParents[i][0] = j;
-                            std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2 << " maxrand: " << allPaths << " specimenMaxValue: " << specimenMaxValue << " specimenValue[j]: "  << specimenValue[j];
-                        }
-                    }
-                    if(tmp2 > tmp + 10000){     //sprawdzenie
-                        std::cout << "\n";
-                        for(int w = 0; w <= cityamount; w++)
-                            std::cout << " " << oldGeneration[i][w];
-                        std::cout << " value: " << specimenValue;
-                    }
+                x = 0;
+                temp = -1;
 
-                    titu = allPaths;
-                    std::cout << "\n t1: " << titu;
-                    titu -= specimenValue[newParents[i][0]];
-                    std::cout << "t2: " << titu;
-                    titu -= 1;
-                    std::cout << "t3: " << titu;
-                    tmp = rand() % titu;
-                    tmp2 = 0;
-                    for(int j = 0; tmp2 < tmp; j++)
-                    {
-                        if(j == newParents[i][0]) j++;
+                for(int i = 0; i < popChild; i++){
+
+                    x = 0;
+                    temp = -1;
+                                                                // stworzenie wartosci bedacej suma wszystkich mozliwych szans dla osobnikow na
+                    do{                                         // zostanie rodzicami (bycie lepszym od najgorszego o dana wartosc +1). nastepuje
+                        tmp = rand() % allPaths;                // wylosowanie wartosci a nastepnie jest sprawdzane w ktorym osobniku znajduje sie wylosowana
+                        tmp2 = 0;                               // szansa. Nastepnie jego wartosc jest odejmowana z puli i losuje sie jeszcze raz z jego pominieciem
+                        for(int j = 0; tmp2 < tmp; j++)
+                        {
                             tmp2 += (specimenMaxValue - specimenValue[j] + 1);
-                        if(tmp2 >= tmp){
-                            newParents[i][1] = j;
-                            std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2 << " maxrand: " << titu << " specimenMaxValue: " << specimenMaxValue << " specimenValue[j]: "  << specimenValue[j];;
+                            if(tmp2 >= tmp){
+                                newParents[i][x] = j;
+                                std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2 << " maxrand: " << allPaths << " specimenMaxValue: " << specimenMaxValue << " specimenValue[j]: "  << specimenValue[j];
+                            }
                         }
-                    }
-                    if(tmp2 > tmp + 10000){     //sprawdzenie
-                        std::cout << "\n";
-                        for(int w = 0; w <= cityamount; w++)
-                            std::cout << " " << oldGeneration[i][w];
-                        std::cout << " value: " << specimenValue;
-                    }
+                        if(tmp2 > tmp + 10000){     //sprawdzenie
+                            std::cout << "\n";
+                            for(int w = 0; w <= cityamount; w++)
+                                std::cout << " " << oldGeneration[i][w];
+                            std::cout << " value: " << specimenValue;
+                        }
+                        x = 1;
+                        temp++;
+                    }while(newParents[i][0] == newParents[i][1] || temp == 0);
+
+
+//                    tmp = rand() % (allPaths - specimenValue[newParents[i][0]] - 1);
+//                    tmp2 = 0;
+//                    for(int j = 0; tmp2 < tmp; j++)
+//                    {
+//                        if(j == newParents[i][0]) j++;
+//                            tmp2 += (specimenMaxValue - specimenValue[j] + 1);
+//                        if(tmp2 >= tmp){
+//                            newParents[i][1] = j;
+//                            std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2 << " maxrand: " << (allPaths - specimenValue[newParents[i][0]] - 1) << " specimenMaxValue: " << specimenMaxValue << " specimenValue[j]: "  << specimenValue[j];;
+//                        }
+//                    }
+//                    if(tmp2 > tmp + 10000){     //sprawdzenie
+//                        std::cout << "\n";
+//                        for(int w = 0; w <= cityamount; w++)
+//                            std::cout << " " << oldGeneration[i][w];
+//                        std::cout << " value: " << specimenValue;
+//                    }
 
                     if(newParents[i][1] >= popSize || newParents[i][0] >= popSize)
                         std::cout << "\n\n POPSULEM \n\n";
