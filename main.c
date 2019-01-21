@@ -752,13 +752,15 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //            std::cout << "\n  -potomek: ";
 //            for(int u = 0; u <= cityamount; u++)
 //                std::cout << " " << newGeneration[i][u];
-
-            if(newGeneration[i][0] == 0)
-                do{
+            std::cout << " ide sprawdzic " << i;
+            if(newGeneration[i][0] == 0){
+                std::cout << " zw";
+                while(childValue[i] != 0)
+                {
 //                    std::cout << "\n  -rodzic: ";
 //                    for(int u = 0; u <= cityamount; u++)
 //                        std::cout << " " << oldGeneration[tmp][u];
-
+                    std::cout << " w: " << oldGeneration[tmp][0];
                     if(oldGeneration[tmp][0] == -1)
                     {
                         for(int u = 0; u <= cityamount; u++)
@@ -769,17 +771,21 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                         std::cout << "\n zamieniam " << specimenValue[tmp] << " na " << childValue[i];
                         specimenValue[tmp] = childValue[i];
                         childValue[i] = 0;
-                        std::cout << " z takim rezultatem: " << specimenValue[tmp] << " oraz zeruje " << childValue[i];
+                        std::cout << " z takim rezultatem: " << specimenValue[tmp] << " oraz zeruje " << childValue[i] << " nr przejscia: " << i;
                     }
                     tmp++;
-                }while(childValue[i] != 0);
+                    std::cout << " ." << childValue[i];
+                }
+            }
             else
             {
                 for(int j = 0; j <= cityamount; j++)
                     newGeneration[i][j] = 0;
                 childValue[i] = 0;
+                std::cout << "\n usuwam dzieciaka nr: " << i;
             }
         }
+        std::cout << "\n przenioslem wszystko";
 
 //                    std::cout << "\n\n wykonane\n nowa generacja:\n";
 //                    for(int i = 0; i < popSize; i++){
