@@ -439,7 +439,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                         tmp2 += (specimenMaxValue - specimenValue[j] + 1);
                         if(tmp2 >= tmp){
                             newParents[i][0] = j;
-                            std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2;
+                            std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2 << " maxrand: " << allPaths << " specimenMaxValue: " << specimenMaxValue << " specimenValue[j]: "  << specimenValue[j];
                         }
                     }
                     if(tmp2 > tmp + 10000){     //sprawdzenie
@@ -449,15 +449,21 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                         std::cout << " value: " << specimenValue;
                     }
 
-                    tmp = rand() % (allPaths - specimenValue[newParents[i][0]] - 1);
+                    titu = allPaths;
+                    std::cout << "\n t1: " << titu;
+                    titu -= specimenValue[newParents[i][0]];
+                    std::cout << "t2: " << titu;
+                    titu -= 1;
+                    std::cout << "t3: " << titu;
+                    tmp = rand() % titu;
                     tmp2 = 0;
                     for(int j = 0; tmp2 < tmp; j++)
                     {
                         if(j == newParents[i][0]) j++;
-                        tmp2 += (specimenMaxValue - specimenValue[j] + 1);
+                            tmp2 += (specimenMaxValue - specimenValue[j] + 1);
                         if(tmp2 >= tmp){
                             newParents[i][1] = j;
-                            std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2;
+                            std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2 << " maxrand: " << titu << " specimenMaxValue: " << specimenMaxValue << " specimenValue[j]: "  << specimenValue[j];;
                         }
                     }
                     if(tmp2 > tmp + 10000){     //sprawdzenie
@@ -657,9 +663,9 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                     bestPath[j] = newGeneration[i][j];
             }
 //            std::cout << "\n\n dziecko " << i << " ma droge rowna " << childValue[i];
-
-            if(newParents[i][1] >= popSize || newParents[i][0] >= popSize)
-                std::cout << "\n\n ZWARIOWALEM \n\n";
+//
+//            if(childValue[i] > 50000)
+//                std::cout << "\n\n ZWARIOWALEM \n\n";
         }
 
 //        for(int i = 0; i < popSize; i++){
@@ -758,8 +764,10 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                             oldGeneration[tmp][u] = newGeneration[i][u];
                             newGeneration[i][u] = 0;
                         }
+                        std::cout << "\n zamieniam " << specimenValue[tmp] << " na " << childValue[i];
                         specimenValue[tmp] = childValue[i];
                         childValue[i] = 0;
+                        std::cout << " z takim rezultatem: " << specimenValue[tmp] << " oraz zeruje " << childValue[i];
                     }
                     tmp++;
                 }while(childValue[i] != 0);
