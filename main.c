@@ -24,7 +24,7 @@ void chosingfile();
 bool fileread(std::string);
 void writetab(int**);
 void menu();
-int genetical(int, int, int, int, int, char, char, char, char, int, int);
+int genetical(int, int, int, int, int, char, char, char, char, int, int, int);
 
 
 int  main()
@@ -116,6 +116,7 @@ void menu()
     char mrodzica = '1';
     int wspkrzyzowania = 80;
     int wspmutacji = 1;
+    int maxmutacji = 1;
 
     int choice = -1;
     while(choice != '0')
@@ -132,6 +133,7 @@ void menu()
         if(mmutacji == '2') std::cout << "\n Metoda mutacji: invert";
         if(mmutacji == '3') std::cout << "\n Metoda mutacji: swap";
         std::cout << "\n Wspolczynnik mutacji: " << wspmutacji;
+        std::cout << "\n Maksymalna ilosc mutacji: " << maxmutacji;
         if(mselekcji == '1') std::cout << "\n Metoda selekcji osobnikow: kola ruletki";
         if(mselekcji == '2') std::cout << "\n Metoda selekcji osobnikow: rankingowa";
         if(mselekcji == '3') std::cout << "\n Metoda selekcji osobnikow: turniejowa";
@@ -229,10 +231,16 @@ void menu()
                 if(mmutacji != '1' && mmutacji != '2' && mmutacji != '3') std::cout << "\n Nie ma takiej metody! Sprobuj ponownie!";
             } while (mmutacji != '1' && mmutacji != '2' && mmutacji != '3');
             do {
-                std::cout << "\n\n Podaj wartosc wspolczynnika mutacji: ";
+                std::cout << "\n\n Podaj wartosc wspolczynnika mutacji (zakres 0-100): ";
                 std::cin >> wspmutacji;
-                if(wspmutacji <= 0) std::cout << "\n Wspolczynnik mutacji musi byc wiekszy od zera! Sprobuj ponownie!";
-            } while (wspmutacji <=0);
+                if(wspmutacji < 0 || wspmutacji > 100) std::cout << "\n Wspolczynnik mutacji musi byc wiekszy od zera! Sprobuj ponownie!";
+            } while (wspmutacji <0 || wspmutacji > 100);
+            if(mmutacji == '1' || mmutacji == '2' || mmutacji == '3')
+                do {
+                    std::cout << "\n\n Podaj maksymalna ilosc mutacji na pokolenie (od 0 do 10): ";
+                    std::cin >> maxmutacji;
+                    if(maxmutacji < 0 || maxmutacji > 10) std::cout << "\n Wspolczynnik mutacji musi byc wiekszy od zera! Sprobuj ponownie!";
+                } while (maxmutacji < 0 || maxmutacji > 10);
             break;
         }
         case '6':
@@ -277,7 +285,7 @@ void menu()
         }
         case '9':
         {
-            std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji);
+            std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, maxmutacji);
             break;
         }
         case 't':
@@ -290,7 +298,7 @@ void menu()
             }while(testin <= 0);
 
             for(int k = 0; k < testin; k++)
-                std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji);
+                std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, maxmutacji);
         }
         case '0':
         {
@@ -308,7 +316,7 @@ void menu()
     }
 }
 
-int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild, char mkrzyzowania, char mmutacji, char mselekcji, char mrodzica, int wspkrzyzowania, int wspmutacji)
+int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild, char mkrzyzowania, char mmutacji, char mselekcji, char mrodzica, int wspkrzyzowania, int wspmutacji, int maxmutacji)
 {
 //    std::cout << "\n" <<  kstopu;
 //    std::cout << "\n" <<  maxiteration;
@@ -320,6 +328,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //    std::cout << "\n" <<  mselekcji;
 //    std::cout << "\n" <<  wspkrzyzowania;
 //    std::cout << "\n" <<  wspmutacji;
+//    std::cout << "\n" <<  maxmutacji;
 
     int bestCost = INT_MAX;
     int iteration = 0;
@@ -425,7 +434,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                 for(int i = 0; i < popSize; i++)            //obliczanie szansy na rozmnozenie na podstawie wartosci o ktora jest osobnik lepszy od najgorszej sciezki
                     allPaths += (specimenMaxValue - specimenValue[i] + 1);
 
-                std::cout << "\n maxVal: " << specimenMaxValue << "  allpaths: " << allPaths;
+//                std::cout << "\n maxVal: " << specimenMaxValue << "  allpaths: " << allPaths;
 
                 x = 0;
                 temp = -1;
@@ -443,10 +452,10 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                             tmp2 += (specimenMaxValue - specimenValue[j] + 1);
                             if(tmp2 >= tmp){
                                 newParents[i][x] = j;
-                                std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2 << " maxrand: " << allPaths << " specimenMaxValue: " << specimenMaxValue << " specimenValue[j]: "  << specimenValue[j];
+//                                std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2 << " maxrand: " << allPaths << " specimenMaxValue: " << specimenMaxValue << " specimenValue[j]: "  << specimenValue[j];
                             }
                         }
-                        if(tmp2 > tmp + 10000){     //sprawdzenie
+                        if(tmp2 > tmp + 1000000){     //sprawdzenie
                             std::cout << "\n";
                             for(int w = 0; w <= cityamount; w++)
                                 std::cout << " " << oldGeneration[i][w];
@@ -625,15 +634,94 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
         switch(mmutacji){
             case '1':{  //insert
+                temp = 100;
+                for(int i = 0; i < maxmutacji; i++)
+                {
+                    std::cout << "\n dziecko 2: ";      //sprawdzenie
+                    for(int p = 0; p <= cityamount; p++)
+                        std::cout << " " << newGeneration[2][p];
 
+                    for(int j = 0; j < popChild; j++)
+                       if(rand() % temp <= wspmutacji)
+                       {
+                            k1 = rand() % (cityamount - 1) + 1;
+                            do{
+                                k2 = rand() % (cityamount - 1) + 1;
+                            }while(k1 == k2);
+
+                            if(k1 < k2){
+                                tmp = k1;
+                                k1 = k2;
+                                k2 = tmp;
+                            }
+
+                            tmp = newGeneration[j][k2];  // (k1 > k2)
+                            for(int z = k2; z < k1; z++)
+                                newGeneration[j][z] = newGeneration[j][z + 1];
+                            newGeneration[j][k1] = tmp;
+                       }
+                    temp = temp*1.5;
+                }
                 break;
             }
             case '2':{  //invert
+                temp = 100;
+                for(int i = 0; i < maxmutacji; i++)
+                {
+                    std::cout << "\n dziecko 2: ";      //sprawdzenie
+                    for(int p = 0; p <= cityamount; p++)
+                        std::cout << " " << newGeneration[2][p];
 
+                    for(int j = 0; j < popChild; j++)
+                       if(rand() % temp <= wspmutacji)
+                       {
+                            k1 = rand() % (cityamount - 1) + 1;
+                            do{
+                                k2 = rand() % (cityamount - 1) + 1;
+                            }while(k1 == k2);
+
+                            if(k1 < k2){
+                                tmp = k1;
+                                k1 = k2;
+                                k2 = tmp;
+                            }
+
+                            tmp2 = (k1 - k2)/2;     // (k1 > k2)
+
+                            for(int z = 0; z <= tmp2; z++)
+                            {
+                                tmp = newGeneration[j][k2 + z];
+                                newGeneration[j][k2 + z] = newGeneration[j][k1 - z];
+                                newGeneration[j][k1 - z] = tmp;
+                            }
+                       }
+                    temp = temp*1.5;
+                }
                 break;
             }
             case '3':{  //swap
+                temp = 100;
+                for(int i = 0; i < maxmutacji; i++)
+                {
+                    std::cout << "\n dziecko 2: ";      //sprawdzenie
+                    for(int p = 0; p <= cityamount; p++)
+                        std::cout << " " << newGeneration[2][p];
 
+                    for(int j = 0; j < popChild; j++)
+                       if(rand() % temp <= wspmutacji)
+                       {
+                            k1 = rand() % (cityamount - 1) + 1;
+                            do{
+                                k2 = rand() % (cityamount - 1) + 1;
+                            }while(k1 == k2);
+
+                            tmp = newGeneration[j][k1];
+                            newGeneration[j][k1] = newGeneration[j][k2];
+                            newGeneration[j][k2] = tmp;
+
+                       }
+                    temp = temp*1.5;
+                }
                 break;
             }
             case '4':{  //scramble
@@ -680,11 +768,11 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //                std::cout << " " << newGeneration[i][u];
 //            std::cout << "  osobnik nr: " << i << "  droga: " << childValue[i] << "\n";}
 
-        std::cout << "\n selekcja: " << iteration;
+        std::cout << "\n selekcja: " << iteration << "\n";
 
         switch(mselekcji){
             case '1':{  //kola ruletki
-                allPaths = 0;
+//                allPaths = 0;
 
                 for(int i = 0; i < popSize; i++)            //znajdowanie najkrotszej sciezki w populacji
                     if(specimenValue[i] < specimenMaxValue)
@@ -695,27 +783,40 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
 //                std::cout << "\n\n mvalue" << specimenMaxValue;
 
-                for(int i = 0; i < popSize; i++)            //obliczanie szansy na rozmnozenie na podstawie wartosci o ktora jest osobnik gorszy od najlepszej sciezki
-                    allPaths += (specimenValue[i] - specimenMaxValue + 1);
-                for(int i = 0; i < popChild; i++)
-                    allPaths += (childValue[i] - specimenMaxValue + 1);
+//                for(int i = 0; i < popSize; i++)            //obliczanie szansy na rozmnozenie na podstawie wartosci o ktora jest osobnik gorszy od najlepszej sciezki
+//                    allPaths += (specimenValue[i] - specimenMaxValue + 1);
+//                for(int i = 0; i < popChild; i++)
+//                    allPaths += (childValue[i] - specimenMaxValue + 1);
 
-//                std::cout << "\n\n allpaths" << allPaths;
+//                std::cout << "\n allpaths: " << allPaths <<"\n\n";
 
-                for(int i = 0; i < popChild; i++){           //stworzenie wartosci bedacej suma wszystkich mozliwych szans dla osobnikow na
+                for(int i = 0; i < popChild; i++){
+
+                    allPaths = 0;
+                    for(int i = 0; i < popSize; i++)            //obliczanie szansy na rozmnozenie na podstawie wartosci o ktora jest osobnik gorszy od najlepszej sciezki
+                        if(oldGeneration[i][0] != -1)
+                            allPaths += (specimenValue[i] - specimenMaxValue + 1);
+                    for(int i = 0; i < popChild; i++)
+                        if(newGeneration[i][0] != -1)
+                            allPaths += (childValue[i] - specimenMaxValue + 1);
+
+//                std::cout << "\n allpaths: " << allPaths;
+                                                            //stworzenie wartosci bedacej suma wszystkich mozliwych szans dla osobnikow na
                                                             // zostanie rodzicami (bycie lepszym od najgorszego o dana wartosc +1). nastepuje
                     tmp = rand() % allPaths;                // wylosowanie wartosci a nastepnie jest sprawdzane w ktorym osobniku znajduje sie wylosowana
                     tmp2 = 0;                               // szansa. Nastepnie jego wartosc jest odejmowana z puli i losuje sie jeszcze raz z jego pominieciem
 //                    std::cout << "\n allpaths: " << allPaths;
-                    for(int j = 0; j < popSize && tmp2 < tmp; j++)
+//                    std::cout << " "<< tmp << "-";
+
+                    for(int j = 0; j < popSize && tmp2 <= tmp; j++)
                     {                                    //sprawdzenie starej populacji, potem nowej
                         if(oldGeneration[j][0] != -1){      // w wypadku odrzucania osobnika ustawiamy jego pole startowe na -1
                             tmp2 += (specimenValue[j] - specimenMaxValue + 1);
                             if(tmp2 >= tmp){
                                 oldGeneration[j][0] = -1;
 //                                std::cout << "\n odejmowane oldgen: " << (specimenValue[j] - specimenMaxValue + 1);
-                                allPaths -= (specimenValue[j] - specimenMaxValue + 1);
-//                                std::cout << "\n allpaths: " << allPaths;
+//                                allPaths -= (specimenValue[j] - specimenMaxValue + 1);
+//                                std::cout << "w " << i;
                             }
                         }
                     }
@@ -726,8 +827,8 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                             if(tmp2 >= tmp){
                                 newGeneration[j][0] = -1;
 //                                std::cout << "\n odejmowane dziecka: " << (childValue[j] - specimenMaxValue + 1);
-                                allPaths -= (childValue[j] - specimenMaxValue + 1);
-//                                std::cout << "\n allpaths: " << allPaths;
+//                                allPaths -= (childValue[j] - specimenMaxValue + 1);
+//                                std::cout << "v" << i;
                             }
                         }
                     }
@@ -744,7 +845,12 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
             }
         }
 
-//        std::cout << "\n\n check out";
+//        std::cout << "\n";
+//        for(int t = 0; t < popSize; t++)
+//            std::cout << " " << oldGeneration[t][0];
+//        std::cout << "\n";
+//        for(int t = 0; t < popChild; t++)
+//            std::cout << " " << newGeneration[t][0];
 
         tmp = 0;
         for(int i = 0; i < popChild; i++)       //nadpisywanie wylosowanych oldGen nowymi osobnikami
@@ -752,15 +858,12 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //            std::cout << "\n  -potomek: ";
 //            for(int u = 0; u <= cityamount; u++)
 //                std::cout << " " << newGeneration[i][u];
-            std::cout << " ide sprawdzic " << i;
             if(newGeneration[i][0] == 0){
-                std::cout << " zw";
                 while(childValue[i] != 0)
                 {
 //                    std::cout << "\n  -rodzic: ";
 //                    for(int u = 0; u <= cityamount; u++)
 //                        std::cout << " " << oldGeneration[tmp][u];
-                    std::cout << " w: " << oldGeneration[tmp][0];
                     if(oldGeneration[tmp][0] == -1)
                     {
                         for(int u = 0; u <= cityamount; u++)
@@ -768,13 +871,13 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                             oldGeneration[tmp][u] = newGeneration[i][u];
                             newGeneration[i][u] = 0;
                         }
-                        std::cout << "\n zamieniam " << specimenValue[tmp] << " na " << childValue[i];
+//                        std::cout << "\n zamieniam " << specimenValue[tmp] << " na " << childValue[i];
                         specimenValue[tmp] = childValue[i];
                         childValue[i] = 0;
-                        std::cout << " z takim rezultatem: " << specimenValue[tmp] << " oraz zeruje " << childValue[i] << " nr przejscia: " << i;
+//                        std::cout << " z takim rezultatem: " << specimenValue[tmp] << " oraz zeruje " << childValue[i] << " nr przejscia: " << i;
                     }
                     tmp++;
-                    std::cout << " ." << childValue[i];
+//                    std::cout << " ." << childValue[i];
                 }
             }
             else
@@ -782,7 +885,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                 for(int j = 0; j <= cityamount; j++)
                     newGeneration[i][j] = 0;
                 childValue[i] = 0;
-                std::cout << "\n usuwam dzieciaka nr: " << i;
+//                std::cout << "\n usuwam dzieciaka nr: " << i;
             }
         }
         std::cout << "\n przenioslem wszystko";
@@ -794,15 +897,13 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //                            std::cout << " " << oldGeneration[i][u];
 //                    }
 
-//przenies nowa gen na miejsce starej i wykonaj obliczenie dla allPaths i pozostalych wymaganych wartosci
-
 
         end = clock();
-        if(kstopu == '1' && double(end - begin) / CLOCKS_PER_SEC > ttime || kstopu == '3' && double(end - begin) / CLOCKS_PER_SEC > ttime)
+        if((kstopu == '1' && double(end - begin) / CLOCKS_PER_SEC > ttime) || (kstopu == '3' && double(end - begin) / CLOCKS_PER_SEC > ttime))
             {keepGoing = false;
-            std::cout << "\n warunek czasu, wykonywano przez: " << iteration;
+            std::cout << "\n warunek czasu, wykonywano przez: " << iteration << " iteracji";
             }
-        if(kstopu == '2' && iteration >= maxiteration || kstopu == '3' && iteration >= maxiteration)
+        if((kstopu == '2' && iteration >= maxiteration) || (kstopu == '3' && iteration >= maxiteration))
             {keepGoing = false;
             std::cout << "\n warunek iteracji, iteracja nr: " << iteration;
             }
