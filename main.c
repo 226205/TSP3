@@ -106,11 +106,11 @@ void genmenu()
     int kstopu = '2';
     int maxiteration = 100;
     int ttime = 4;
-    int popSize = 12;
-    int popChild = 4;
+    int popSize = 60;
+    int popChild = 21;
     char mkrzyzowania = '2';
     char mmutacji = '3';
-    char mselekcji = '1';
+    char mselekcji = '3';
     char mrodzica = '3';
     int wspkrzyzowania = 80;
     int wspmutacji = 1;
@@ -352,6 +352,9 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
         specimenValue[i] = 0;
 
     bool* bAllPop = new bool[popSize + popChild];
+    bool* bAllPop2 = new bool[popSize + popChild];
+//    bool* bPopSize = new bool[popSize];
+//    bool* bPopChild = new bool[popChild];
     bool* bCity = new bool[cityamount + 1];            //stworzenie tablicy mowiacej czy dana liczba juz wystapila w sekwencji
     bCity[0] = bCity[cityamount] = true;              //podpisanie pierwszego i ostatniego elementu jako juz wykonanego
     cityOperator[0] = cityOperator[cityamount] = 0;
@@ -594,9 +597,9 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                     esc = 0;            //pomocniczy warunek petli dowhile, wymuszajacy 2 przejscia petli w normalnych okolicznosciach
 
 
-                                            for(int u = 0; u <= cityamount; u++)
-                            std::cout << " " << newGeneration[(i*2+k1)][u];
-                        std::cout << "  -pot00omek " << k1 << "\n";
+//                         for(int u = 0; u <= cityamount; u++)
+//                            std::cout << " " << newGeneration[(i*2+k1)][u];
+//                        std::cout << "  -pot00omek " << k1 << "\n";
 
 
 
@@ -670,7 +673,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                                         cityOperator[tmp2] = 0;
                                         if(newGeneration[(i*2+k1)][j] == 0)
                                         {
-                                            std::cout <<"\n WSZEDLEM222!";
+//                                            std::cout <<"\n WSZEDLEM222!";
                                             newGeneration[(i*2+k1)][j] = cityOperator[j];
                                             tmp--;
                                             cityOperator[j] = 0;
@@ -909,7 +912,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
                     for(int j = 0; j < popSize && tmp2 <= tmp; j++)
                     {                                       //sprawdzenie starej populacji, potem nowej
-                        if(bAllPop[j] == false){      // w wypadku odrzucania osobnika ustawiamy jego pole startowe na -1
+                        if(bAllPop[j] == false){
                             tmp2 += (specimenValue[j] - specimenMaxValue + 1);
                             if(tmp2 >= tmp){
                                 bAllPop[j] = true;
@@ -939,36 +942,45 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                 break;
             }
             case '3':{  //turniejowa
-                for(int i = 0; i < ((popChild / 2) + (popChild % 2)); i++)
+                for(int j = 0; j < popSize + popChild; j++)    //zerowanie tablicy
+                    bAllPop[j] = false;
+
+                for(int i = 0; i < popChild; i++)
                 {
                     for(int j = 0; j < popSize + popChild; j++)    //zerowanie tablicy
-                        bAllPop[j] = false;
+                        bAllPop2[j] = false;
 
-                    x = 0;
-                    do{
-                        temp = INT_MAX;   // to bedzie najlepsza znaleziona wartosc
-                        for(int j = 0; j < wsprodzica; j++)
-                        {
-                            do{
-                                tmp = rand() % popSize;
-                            }while(bAllPop[tmp] == true);
-                            bAllPop[tmp] = true;
+                    temp = INT_MAX;             // to bedzie najgorsza znaleziona wartosc
+                    for(int j = 0; j < wspselekcji; j++)
+                    {
+                        do{
+                            tmp = rand() % (popSize + popChild);
+                        }while(bAllPop2[tmp] == true || bAllPop[tmp] == true);
+//                        std::cout << i << " wylosowalem: " << tmp << "  maxtemp: " << temp;
+                        bAllPop2[tmp] = true;
 
+                        if(tmp >= popSize){
+//                            std::cout << " wiec sprawdzam rodzica nr: " << tmp << " o wartosci: " << childValue[tmp - popSize] <<"\n";
+                            if(childValue[tmp - popSize] < temp){
+                                temp = childValue[tmp - popSize];
+                                tmp2 = tmp;}
+                        }
+                        else{
+//                            std::cout << " wiec sprawdzam rodzica nr: " << tmp << " o wartosci: " << specimenValue[tmp] <<"\n";
                             if(specimenValue[tmp] < temp){
                                 temp = specimenValue[tmp];
-                                tmp2 = tmp;
-                            }
+                                tmp2 = tmp;}
                         }
-                        newParents[i][x] = tmp2;
-                        x++;
-                    }while(x <= 1);
+                    }
+//                    std::cout << " do ballpop trafia nr: " << tmp2 << "\n";
+                    bAllPop[tmp2] = true;
                 }
-
-                for(int i = 0; i < ((popChild / 2) + (popChild % 2)); i++){
-//                    std::cout << "\n " << newParents[i][0] << "  " << newParents[i][1];
-                    if(newParents[i][0] == newParents[i][1])
-                        std::cout << "\n\n\n\n POPSULEM TURNIEJ \n\n\n\n";
-                }
+                temp = 0;
+                for(int i = 0; i < popChild + popSize; i++){
+//                    std::cout << " " << bAllPop[i];
+                    if(bAllPop[i] == true) temp++;}
+                if(temp != popChild)
+                    std::cout << "\n\n\n\n POPSULEM TURNIEJ!!! \n temp: " << temp << "\n\n\n\n";
                 break;
             }
             case '4':{  //rangowa
@@ -1000,11 +1012,11 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                             oldGeneration[tmp][u] = newGeneration[i][u];
                             newGeneration[i][u] = 0;
                         }
-                        std::cout << "\n zamieniam " << specimenValue[tmp] << " na " << childValue[i];
+//                        std::cout << "\n zamieniam " << specimenValue[tmp] << " na " << childValue[i];
                         specimenValue[tmp] = childValue[i];
                         childValue[i] = 0;
                         bAllPop[tmp] = false;
-                        std::cout << " z takim rezultatem: " << specimenValue[tmp] << " oraz zeruje " << childValue[i] << " nr przejscia: " << i;
+//                        std::cout << " z takim rezultatem: " << specimenValue[tmp] << " oraz zeruje " << childValue[i] << " nr przejscia: " << i;
                     }
                     tmp++;
 //                    std::cout << " ." << childValue[i];
@@ -1015,17 +1027,17 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                 for(int j = 0; j <= cityamount; j++)
                     newGeneration[i][j] = 0;
                 childValue[i] = 0;
-                std::cout << "\n usuwam dzieciaka nr: " << i;
+//                std::cout << "\n usuwam dzieciaka nr: " << i;
             }
         }
         for(int i = 0; i < popSize + popChild; i++)
             bAllPop[i] = false;
-
-        std::cout << "\n przenioslem wszystko ";
-        std::cout << "\n stara generacja potomkow: ";
-        for(int i = 0; i < popChild; i++)
-        for(int j = 0; j <= cityamount; j++)
-            std::cout << " " << newGeneration[i][j];
+//
+//        std::cout << "\n przenioslem wszystko ";
+//        std::cout << "\n stara generacja potomkow: ";
+//        for(int i = 0; i < popChild; i++)
+//        for(int j = 0; j <= cityamount; j++)
+//            std::cout << " " << newGeneration[i][j];
 
 //                    std::cout << "\n\n wykonane\n nowa generacja:\n";
 //                    for(int i = 0; i < popSize; i++){
@@ -1062,6 +1074,9 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
     delete[] bCity;
     delete[] bAllPop;
+    delete[] bAllPop2;
+//    delete[] bPopSize;
+//    delete[] bPopChild;
     for(int i = 0; i < popSize; i++)        // zwolnij pamiec
         delete[] oldGeneration[i];
     for(int i = 0; i < popChild; i++)
