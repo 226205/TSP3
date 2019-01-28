@@ -6,6 +6,8 @@
 //- 3 metody selekcji osobnikow: ruletka, ranking, turniej, rangi
 //- 3 warunki stopu: czas, ilosc iteracji, ilosc iteracji bez poprawienia bestCost
 
+// blad we wzorze na prawdopodobienstwo w prezentacji dr Kaplona
+
 #include <fstream>
 #include <iostream>
 #include <conio.h>
@@ -16,7 +18,6 @@
 
 int cityamount = 0;
 int **distances;
-bool divers = true;
 
 
 void chosingfile();
@@ -24,6 +25,7 @@ bool fileread(std::string);
 void writetab(int**);
 void genmenu();
 int genetical(int, int, int, int, int, char, char, char, char, int, int, int, int, int);
+int mrowki();
 
 
 int  main()
@@ -34,7 +36,6 @@ int  main()
 
 //    getche();
 }
-
 
 void chosingfile()                          // menu wybierania plikow do odczytu
 {
@@ -69,7 +70,6 @@ void chosingfile()                          // menu wybierania plikow do odczytu
     std::cout << "\nPlik " << filename << " zostal wczytany poprawnie.";
 }
 
-
 bool fileread(std::string filename)         // funkcja do odczytywania danych z pliku
 {
     std::fstream plik;
@@ -87,7 +87,6 @@ bool fileread(std::string filename)         // funkcja do odczytywania danych z 
     }
     return 0;
 }
-
 
 void writetab(int** cities)                 // wypisywanie aktualnej macierzy przejsc miedzy miastami
 {
@@ -157,6 +156,7 @@ void genmenu()
         std::cout << "\n9: Algorytm Genetyczny";
         std::cout << "\n0. Wyjscie ";
         std::cout << "\nt. Wielokrotne Testowanie Algorytmu";
+        std::cout << "\nm. Algorytm Mrowkowy";
         std::cout << "\nTwoj wybor: ";
 
         choice = getche();
@@ -300,6 +300,10 @@ void genmenu()
 
             for(int k = 0; k < testin; k++)
                 std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, wspselekcji, wsprodzica, maxmutacji);
+        }
+        case 'm':{  //mrowki!
+            mrowki();
+            break;
         }
         case '0':{  //exit
             for(int i=0;i<cityamount;++i)        // zwolnij pamiec
@@ -1090,6 +1094,166 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
     delete[] cityOperator;
     delete[] allPopOperator;
     delete[] bestPath;
+
+    return bestCost;
+}
+
+
+int mrowki() //QAS
+{
+    int feromon = 0;
+    for(int i = 0; i < cityamount; i++){
+        for(int j = 0; j < cityamount; j++){
+            if(i != j){
+                feromon += distances[i][j];
+            }
+        }
+    }
+    feromon = feromon / ((cityamount - 1) * (cityamount - 1));
+
+
+    int bestCost = INT_MAX;
+    int* bestPath = new int[cityamount + 1];
+    double evap = 0.5; // stopien parowania feromonu, zakres <0,1>
+    double alfa = 1; // stopien atrakcyjnosci feromonu
+    double beta = 3; // stopien atrakcyjnosci krotszej sciezki
+    int colonySize = cityamount; // wielkosc koloni
+    int maxIteration = 10;  //ilosc iteracji programu
+    char choice;
+    int tmp = 0;
+    int tmp2 = 0;
+    int tmpMax = 0;
+    int x = 0;
+    double temp = 0.0;
+
+    std::cout << "\n\n Algorytm mrowkowy:\n Czy chcesz wprowadzic wlasne parametry? (y. = tak): ";
+    choice = getche();
+    if(choice == 'y')
+    {
+        std::cout << "Podaj stopien parowania feromonu (zakres 0-1): ";
+        std::cin >> evap;
+        std::cout << "Podaj parametr alfa: ";
+        std::cin >> alfa;
+        std::cout << "Podaj parametr beta: ";
+        std::cin >> beta;
+        std::cout << "Podaj wielkosc koloni: ";
+        std::cin >> colonySize;
+        std::cout << "Podaj ilosc iteracji: ";
+        std::cin >> colonySize;
+    }
+
+    bool** antTabu = new bool*[colonySize];
+    int** antPath = new int*[colonySize];
+    int* distanceToTravel = new int[colonySize];
+    for(int i = 0; i < colonySize; i++){
+        antTabu[i] = new bool[cityamount];
+        antPath[i] = new int[cityamount + 1];
+        distanceToTravel[i] = 0;
+        tmp = rand() % cityamount;
+        antPath[i][0] = antPath[i][cityamount] = tmp;
+        for(int j = 0; j < cityamount; j++){
+            antTabu[i][j] = false;}
+        antTabu[i][tmp] = true;
+    }
+
+    double** phTab = new double*[cityamount];   // tablica feromonu
+    for(int i = 0; i < cityamount; i++){
+        phTab[i] = new double[cityamount];
+        for(int j = 0; j < cityamount; j++)
+            phTab[i][j] = feromon;                    // poczatkowa ilosc feromonu na kazdej krawedzi
+    }
+
+
+
+
+    for(int q = 0; q < maxIteration; q++)
+    {
+        for(int i = 0; i < (cityamount - 1); i++) // i - pozycja w sekwencji miast ktora jest aktualnie opracowywana
+        {
+            for(int j = 0; j < colonySize; j++) // j - nr aktualnie opracowywanej mrowki
+            {
+                tmpMax = 0;     //to bedzie caly przedzial losowania
+                tmp = 0;
+                for(int k = 0; k < cityamount; k++) //wyliczanie wszystkich przejsc do nastepnych miast
+                {   std::cout << "\n1";
+                    if(antTabu[j][k] == false){
+                        temp = distances[antPath[j][i]][k];
+                        std::cout << "2: " << pow(phTab[j][k], alfa) << " " << pow(temp, beta) ;  /////////////////////ten warunek nie dziala !!!
+                        tmpMax += pow(phTab[j][k], alfa) / pow( distances[antPath[j][i]][k], beta);}
+                }
+
+                std::cout << "\n tmpMax: " << tmpMax;
+                tmp2 = rand() % tmpMax;     //losujemy miasto z okreslonym prawdopodobienstwem
+                for(x = 0; tmp < tmp2; x++)
+                {
+                    if(antTabu[j][x] == false)
+                        tmp += pow(phTab[j][x], alfa) * pow( ( 1/ distances[antPath[j][i]][x] ), beta);
+                }
+                antTabu[j][x] = true;
+                antPath[j][i + 1] = x;
+            }
+
+            for(int j = 0; j < cityamount; j++)   //pomnozenie ilosci feromonu na sciezkach przez evap
+                for(int k = 0; k < cityamount; k++)
+                    phTab[j][k] *= evap;
+
+            for(int j = 0; j < colonySize; j++) // j - nr aktualnie opracowywanej mrowki
+                phTab[antPath[j][i]][antPath[j][i + 1]] += (feromon * (feromon / distances[antPath[j][i]][antPath[j][i + 1]])); //dodawanie feromonu tam gdzie bylo przejscie: feromon * (feromon/distances[][])
+
+        }
+
+        for(int j = 0; j < cityamount; j++)   //pomnozenie ilosci feromonu na sciezkach przez evap po raz ostatni
+            for(int k = 0; k < cityamount; k++)
+                phTab[j][k] *= evap;
+
+        for(int j = 0; j < colonySize; j++) // j - nr aktualnie opracowywanej mrowki
+            phTab[antPath[j][cityamount - 1]][antPath[j][cityamount]] += (feromon * (feromon / distances[antPath[j][cityamount - 1]][antPath[j][cityamount]])); //dodawanie feromonu tam gdzie bylo przejscie: feromon * (feromon/distances[][])
+
+
+
+        //obliczanie drogi i zerowanie tabu oraz znajdowanie bestpath i bestcost
+
+        for(int j = 0; j < colonySize; j++){    //nr mrowki
+            tmp = 0;
+            for(int k = 0; k < cityamount; k++){    //nr miasta w seq
+                tmp += distances[antPath[j][k]][antPath[j][k + 1]];
+            }
+            if(tmp < bestCost){
+                bestCost = tmp;
+                for(int k = 0; k <= cityamount; k++)
+                    bestPath[k] = antPath[j][k];
+            }
+        }
+
+        for(int j = 0; j < colonySize; j++)
+            for(int k = 0; k < cityamount; k++)
+                antTabu[j][k] = false;
+
+        //sprawdzamy czy distanceToTravel == 0
+        //jesli tak, to sprawdzenie czy mrowka nie przeszla juz wszystkich miast
+        //jesli tak to sprawdzamy sekwencje pod katem bestcost i ja zerujemy - anttabu,antpath(zeruje sie samo), anountofvisited
+        //jesli nie to po prostu wylosowanie nowego miasta dla mrowki, chyba ze zostalo jej ostatnie, wtedy zawsze je losuje
+        //jesli ani to ani to, mrowka jest pomijana
+
+        //aktualizacja ilosci feromonu na sciezkach, ilosc dodawanego feromonu to x/dlugosc sciezki
+    }
+
+    std::cout << "\n\n Najlepszy znaleziony wynik: " << bestCost << " zostal otrzymany jako wynik sekwencji: \n";
+    for(int i = 0; i <= cityamount; i++)
+        std::cout << " " << bestPath[i];
+
+
+    for(int i = 0; i < colonySize; i++){    // sekcja czyszczenia pamięci
+        delete[] antTabu[i];
+        delete[] antPath[i];
+    }
+    for(int i = 0; i < cityamount; i++)
+        delete[] phTab[i];
+    delete[] phTab;
+    delete[] distanceToTravel;
+    delete[] antTabu;
+    delete[] antPath;
+    delete[] bestPath
 
     return bestCost;
 }
