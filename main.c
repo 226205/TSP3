@@ -302,7 +302,7 @@ void genmenu()
                 std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, wspselekcji, wsprodzica, maxmutacji);
         }
         case 'm':{  //mrowki!
-            mrowki();
+            std::cout << mrowki();
             break;
         }
         case '0':{  //exit
@@ -1101,7 +1101,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
 int mrowki() //QAS
 {
-    int feromon = 0;
+    double feromon = 0.0;
     for(int i = 0; i < cityamount; i++){
         for(int j = 0; j < cityamount; j++){
             if(i != j){
@@ -1110,7 +1110,7 @@ int mrowki() //QAS
         }
     }
     feromon = feromon / ((cityamount - 1) * (cityamount - 1));
-
+    std::cout << "\n startowy feromon: " << feromon << "\n";
 
     int bestCost = INT_MAX;
     int* bestPath = new int[cityamount + 1];
@@ -1118,13 +1118,19 @@ int mrowki() //QAS
     double alfa = 1; // stopien atrakcyjnosci feromonu
     double beta = 3; // stopien atrakcyjnosci krotszej sciezki
     int colonySize = cityamount; // wielkosc koloni
-    int maxIteration = 10;  //ilosc iteracji programu
+    int maxIteration = 1;  //ilosc iteracji programu
     char choice;
     int tmp = 0;
     int tmp2 = 0;
-    int tmpMax = 0;
+    int tmpLos = 0;
+    int tmp3 = 0;
+    double tmpMax = 0.0;
     int x = 0;
     double temp = 0.0;
+    double tempD = 0.0;
+    double temp2 = 0.0;
+    double temp3 = 0.0;
+    int rzad = 0;
 
     std::cout << "\n\n Algorytm mrowkowy:\n Czy chcesz wprowadzic wlasne parametry? (y. = tak): ";
     choice = getche();
@@ -1172,33 +1178,63 @@ int mrowki() //QAS
         {
             for(int j = 0; j < colonySize; j++) // j - nr aktualnie opracowywanej mrowki
             {
-                tmpMax = 0;     //to bedzie caly przedzial losowania
-                tmp = 0;
+                tmpMax = 0.0;     //to bedzie caly przedzial losowania
+                temp2 = 0.0;
                 for(int k = 0; k < cityamount; k++) //wyliczanie wszystkich przejsc do nastepnych miast
-                {   std::cout << "\n1";
+                {
                     if(antTabu[j][k] == false){
-                        temp = distances[antPath[j][i]][k];
-                        std::cout << "2: " << pow(phTab[j][k], alfa) << " " << pow(temp, beta) ;  /////////////////////ten warunek nie dziala !!!
+//                        temp = distances[antPath[j][i]][k];
+//                        std::cout << "2: " << pow(phTab[j][k], alfa) << " " << pow(distances[antPath[j][i]][k], beta) ;
                         tmpMax += pow(phTab[j][k], alfa) / pow( distances[antPath[j][i]][k], beta);}
                 }
+                std::cout << "\n tmpMax: " << tmpMax ;
+                for(rzad = 0; tmpMax < 10000; rzad++) // sprawdzanie rzedu wielkosci, niezbedne do losowania
+                    tmpMax = tmpMax * 10;
+                std::cout << " rzad: " << rzad << " nowe tmpMax: " << tmpMax;
 
-                std::cout << "\n tmpMax: " << tmpMax;
-                tmp2 = rand() % tmpMax;     //losujemy miasto z okreslonym prawdopodobienstwem
-                for(x = 0; tmp < tmp2; x++)
-                {
-                    if(antTabu[j][x] == false)
-                        tmp += pow(phTab[j][x], alfa) * pow( ( 1/ distances[antPath[j][i]][x] ), beta);
-                }
-                antTabu[j][x] = true;
-                antPath[j][i + 1] = x;
+                tmp3 = tmpMax;
+                tmpLos = rand() % tmp3;     //losujemy miasto z okreslonym prawdopodobienstwem
+                std::cout << " tmp los:  " << tmpLos << "\n";
+
+                tmp2 = 0;
+                x = 0;
+
+                do{
+                    if(antTabu[j][x] == false){
+                        temp = pow(phTab[j][x], alfa) / pow(distances[antPath[j][i]][x], beta);
+                        temp2 += temp * pow(10, rzad);
+                        tmp2 = temp2;
+                    }
+                    x++;
+                    std::cout << "   " << temp2;
+                }while(tmp2 < tmpLos);
+                antTabu[j][x - 1] = true;
+                antPath[j][i + 1] = x - 1;
+
+                std::cout << "\n mrowka: " << j << " wykonuje przejscie z: " << antPath[j][i] << " do: " << antPath[j][i + 1] << " pokonujac przy tym: " << distances[antPath[j][i]][antPath[j][i + 1]] << " nowy vBool: \n";
+                for(int o = 0; o < cityamount; o++)
+                    std::cout << " " << antTabu[j][o];
+
             }
+            std::cout << "\n\n nowa fala";
 
             for(int j = 0; j < cityamount; j++)   //pomnozenie ilosci feromonu na sciezkach przez evap
                 for(int k = 0; k < cityamount; k++)
                     phTab[j][k] *= evap;
 
-            for(int j = 0; j < colonySize; j++) // j - nr aktualnie opracowywanej mrowki
-                phTab[antPath[j][i]][antPath[j][i + 1]] += (feromon * (feromon / distances[antPath[j][i]][antPath[j][i + 1]])); //dodawanie feromonu tam gdzie bylo przejscie: feromon * (feromon/distances[][])
+
+            for(int j = 0; j < colonySize; j++){ // j - nr aktualnie opracowywanej mrowki
+                tempD = feromon / distances[antPath[j][i]][antPath[j][i + 1]];
+                std::cout << "\n do: " << phTab[antPath[j][i]][antPath[j][i + 1]] << " tempD: " << feromon << " / " << distances[antPath[j][i]][antPath[j][i + 1]] << " wiec dodajemy " << (feromon * tempD);
+                phTab[antPath[j][i]][antPath[j][i + 1]] += (feromon * tempD); //dodawanie feromonu tam gdzie bylo przejscie: feromon * (feromon/distances[][])
+            }
+
+            std::cout << "\n sprawdzenie: ";
+            for(int j = 0; j < cityamount; j++){  // sprawdzanie
+                for(int k = 0; k < cityamount; k++)
+                    if(phTab[j][k] != phTab[0][0])
+                        std::cout << "\n Dla mrowki: " << j << " na pozycji " << k << " nowy feromon wynosi: " << phTab[j][k];
+            }
 
         }
 
@@ -1253,7 +1289,7 @@ int mrowki() //QAS
     delete[] distanceToTravel;
     delete[] antTabu;
     delete[] antPath;
-    delete[] bestPath
+    delete[] bestPath;
 
     return bestCost;
 }
