@@ -595,7 +595,63 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
         std::cout << "\n krzyzowanie: " << iteration;
         switch(mkrzyzowania){
             case '1':{ //OX
+                for(int i = 0; i < ((popChild / 2) + (popChild % 2)); i++)
+                {
+                    loc1 = rand() % (cityamount - 1) + 1;         //wylosowanie locusow
+                    loc2 = rand() % (cityamount - 1) + 1;
+                    if(loc1 > loc2){
+                        temp = loc1;                              //ustawienie ich w kolejnosci
+                        loc1 = loc2;
+                        loc2 = temp;
+                    }
+                    k1 = 0;             //rodzic numer 1 -> k1 = 0, k2 = 1 ; na koncu petli nastepuje zamiana miejsc
+                    k2 = 1;
+                    esc = 0;            //pomocniczy warunek petli dowhile, wymuszajacy 2 przejscia petli w normalnych okolicznosciach
 
+                    do
+                    {
+                        for(int j = 1; j < cityamount; j++){        //zerowanie uzywanych tablic
+                            bCity[j] = false;
+                        }
+                        for(int j = loc1; j <= loc2; j++){              // ustawienie przepisanych miast jako odwiedzonych
+                            newGeneration[(i*2+k1)][j] = oldGeneration[newParents[i][k1]][j];
+                            bCity[oldGeneration[newParents[i][k1]][j]] = true;
+                        }
+                        temp = loc2 + 1;
+                        for(int j = (loc2 + 1); j < cityamount; j++)
+                        {
+                            if(bCity[oldGeneration[newParents[i][k1]][j]] == false)
+                                {
+                                    newGeneration[(i*2+k1)][temp] = oldGeneration[newParents[i][k1]][j];
+                                    bCity[oldGeneration[newParents[i][k1]][j]] == true;
+                                    temp++;
+                                }
+                        }
+
+                        for(int j = 0; j < loc1; j++)
+                        {
+                            if(temp == cityamount)
+                                temp = 1;
+
+                            if(bCity[oldGeneration[newParents[i][k1]][j]] == false)
+                                {
+                                    newGeneration[(i*2+k1)][temp] = oldGeneration[newParents[i][k1]][j];
+                                    bCity[oldGeneration[newParents[i][k1]][j]] == true;
+                                    temp++;
+                                }
+                        }
+
+
+
+
+
+                        temp = k1;      //zamiana rodzicow miejscami
+                        k1 = k2;
+                        k2 = temp;
+                        esc++;
+                    }while(esc <= 1 && i < (popChild / 2));
+
+                }
                 break;
             }
             case '3':{ //HX - bez breaka, hx jest metoda pmx z tylko jednym locusem, wiec ustawiajac locus pmx na ostatnia pozycje dziala tak samo!
@@ -848,10 +904,10 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                 }
                 break;
             }
-            case '4':{  //scramble
-
-                break;
-            }
+//            case '4':{  //scramble
+//
+//                break;
+//            }
             default:{
                 break;
             }
@@ -1010,9 +1066,9 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
                     }
                 }
-                std::cout << "\n";
-                for(int i = 0; i < popChild + popSize; i++)
-                    std::cout << " " << allPopOperator[i];
+//                std::cout << "\n";
+//                for(int i = 0; i < popChild + popSize; i++)
+//                    std::cout << " " << allPopOperator[i];
                 for(int i = succession; i < popChild; i++)
                     bAllPop[allPopOperator[i]] = true;
 
