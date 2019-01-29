@@ -24,7 +24,7 @@ void chosingfile();
 bool fileread(std::string);
 void writetab(int**);
 void genmenu();
-int genetical(int, int, int, int, int, char, char, char, char, int, int, int, int, int);
+int genetical(int, int, int, int, int, char, char, char, char, int, int, int, int, int, bool);
 int mrowki();
 
 
@@ -102,6 +102,7 @@ void writetab(int** cities)                 // wypisywanie aktualnej macierzy pr
 
 void genmenu()
 {
+    bool sukcesja = false;
     int kstopu = '2';
     int maxiteration = 100;
     int ttime = 4;
@@ -118,6 +119,7 @@ void genmenu()
     int maxmutacji = 1;
 
     int choice = -1;
+    char choice2;
     while(choice != '0')
     {
         std::cout << "\n\n\n Aktualnie ustawione parametry programu: ";
@@ -127,7 +129,7 @@ void genmenu()
         if(mkrzyzowania == '1') std::cout << "\n Metoda krzyzowania: OX";
         if(mkrzyzowania == '2') std::cout << "\n Metoda krzyzowania: PMX";
         if(mkrzyzowania == '3') std::cout << "\n Metoda krzyzowania: HX";
-        std::cout << "\n Wspolczynnik krzyzowania: " << wspkrzyzowania;
+//        std::cout << "\n Wspolczynnik krzyzowania: " << wspkrzyzowania;
         if(mmutacji == '1') std::cout << "\n Metoda mutacji: insert";
         if(mmutacji == '2') std::cout << "\n Metoda mutacji: invert";
         if(mmutacji == '3') std::cout << "\n Metoda mutacji: swap";
@@ -136,13 +138,15 @@ void genmenu()
         if(mselekcji == '1') std::cout << "\n Metoda selekcji osobnikow: kola ruletki";
         if(mselekcji == '2') std::cout << "\n Metoda selekcji osobnikow: rankingowa";
         if(mselekcji == '3') std::cout << "\n Metoda selekcji osobnikow: turniejowa\n Wielkosc turnieju: " << wspselekcji;
-        if(mselekcji == '4') std::cout << "\n Metoda selekcji osobnikow: rangowa";
+//        if(mselekcji == '4') std::cout << "\n Metoda selekcji osobnikow: rangowa";
         if(mrodzica == '1') std::cout << "\n Metoda selekcji rodzicow: kola ruletki";
         if(mrodzica == '2') std::cout << "\n Metoda selekcji rodzicow: losowa";
         if(mrodzica == '3') std::cout << "\n Metoda selekcji rodzicow: turniejowa\n Wielkosc turnieju: " << wsprodzica;
-        if(mrodzica == '4') std::cout << "\n Metoda selekcji rodzicow: rangowa";
+//        if(mrodzica == '4') std::cout << "\n Metoda selekcji rodzicow: rangowa";
         std::cout << "\n Wielkosc populacji: " << popSize;
         std::cout << "\n Ilosc potomkow w kazdym pokoleniu populacji: " << popChild;
+        if(sukcesja == false) std::cout << "\n Sukcesja: wylaczona";
+        if(sukcesja == true) std::cout << "\n Sukcesja: wlaczona";
 
         std::cout << "\n\n Wybierz opcje do rozwiazania TSP:";
         std::cout << "\n1. Wybierz nowy plik z danymi";
@@ -211,11 +215,11 @@ void genmenu()
                 mkrzyzowania = getche();
                 if(mkrzyzowania != '1' && mkrzyzowania != '2' && mkrzyzowania != '3') std::cout << "\n Nie ma takiej metody! Sprobuj ponownie!";
             } while (mkrzyzowania != '1' && mkrzyzowania != '2' && mkrzyzowania != '3');
-            do {
-                std::cout << "\n\n Podaj wartosc wspolczynnika krzyzowania: ";
-                std::cin >> wspkrzyzowania;
-                if(wspkrzyzowania <= 0) std::cout << "\n Wspolczynnik krzyzowania musi byc wiekszy od zera! Sprobuj ponownie!";
-            } while (wspkrzyzowania <=0);
+//            do {
+//                std::cout << "\n\n Podaj wartosc wspolczynnika krzyzowania: ";
+//                std::cin >> wspkrzyzowania;
+//                if(wspkrzyzowania <= 0) std::cout << "\n Wspolczynnik krzyzowania musi byc wiekszy od zera! Sprobuj ponownie!";
+//            } while (wspkrzyzowania <=0);
             break;
         }
         case '5':{  //mutacja
@@ -247,11 +251,17 @@ void genmenu()
                 std::cout << "\n 1. kola ruletki";
                 std::cout << "\n 2. rankingowa";
                 std::cout << "\n 3. turniejowa";
-                std::cout << "\n 4. rangowa";
+//                std::cout << "\n 4. rangowa";
                 std::cout << "\n Twoj wybor: ";
                 mselekcji = getche();
-                if(mselekcji != '1' && mselekcji != '2' && mselekcji != '3' && mselekcji != '4') std::cout << "\n Nie ma takiej metody! Sprobuj ponownie!";
-            } while (mselekcji != '1' && mselekcji != '2' && mselekcji != '3' && mselekcji != '4');
+                if(mselekcji != '1' && mselekcji != '2' && mselekcji != '3'/* && mselekcji != '4'*/) std::cout << "\n Nie ma takiej metody! Sprobuj ponownie!";
+            } while (mselekcji != '1' && mselekcji != '2' && mselekcji != '3'/* && mselekcji != '4'*/);
+             if(mselekcji == '3')
+                do{
+                    std::cout << "\n\n Wybierz wielkosc turnieju (zakres 1 - " << (popSize/2) - 1 << "): ";
+                    std::cin >> wspselekcji;
+                    if(wspselekcji < 1 && wspselekcji >= (popSize /2)) std::cout << "\n Podaj wartosc z zakresu!";
+                }while(wspselekcji < 1 && wspselekcji >= (popSize /2));
             break;
         }
         case '7':{  //wybor rodzicow
@@ -260,12 +270,12 @@ void genmenu()
                 std::cout << "\n 1. kola ruletki";
                 std::cout << "\n 2. losowa";
                 std::cout << "\n 3. turniejowa";
-                std::cout << "\n 4. rangowa";
+//                std::cout << "\n 4. rangowa";
                 std::cout << "\n Twoj wybor: ";
                 mrodzica = getche();
-                if(mrodzica != '1' && mrodzica != '2'/* && mrodzica != '3'*/) std::cout << "\n Nie ma takiej metody! Sprobuj ponownie!";
-            } while (mrodzica != '1' && mrodzica != '2'/* && mrodzica != '3'*/);
-            if(mrodzica == 3)
+                if(mrodzica != '1' && mrodzica != '2' && mrodzica != '3') std::cout << "\n Nie ma takiej metody! Sprobuj ponownie!";
+            } while (mrodzica != '1' && mrodzica != '2' && mrodzica != '3');
+            if(mrodzica == '3')
                 do{
                     std::cout << "\n\n Wybierz wielkosc turnieju (zakres 1 - " << (popSize/2) - 1 << "): ";
                     std::cin >> wsprodzica;
@@ -284,10 +294,18 @@ void genmenu()
                 std::cin >> popChild;
                 if(popChild < 10 || popChild > 5000) std::cout << "\n Wielkosc nie miesci sie w zakresie! Sprobuj ponownie!";
             } while (popChild < 10 || popChild > 5000);
+
+            std::cout << "\n Czy chcesz zamienic wieklkosc turnieju na 1/4 wielkosci populacji = " << popSize / 4 << " ?? (y = tak) ";
+            choice2 = getche();
+            if(choice2 == 'y')
+                wsprodzica = wspselekcji = popSize / 4;
             break;
         }
         case '9':{  //AG exe
-            std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, wspselekcji, wsprodzica, maxmutacji);
+            if((sukcesja == true && popSize >= popChild) || (mrodzica == '3' && wsprodzica >= (popSize/2)) || (mselekcji == '3' && wspselekcji >= (popSize/2)))
+                std::cout << "\n\n\ Jakis warunek jest popsuty, wprowadz poprawne dane!\n";
+            else
+                std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, wspselekcji, wsprodzica, maxmutacji, sukcesja);
             break;
         }
         case 't':{  //multi AG exes
@@ -299,10 +317,14 @@ void genmenu()
             }while(testin <= 0);
 
             for(int k = 0; k < testin; k++)
-                std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, wspselekcji, wsprodzica, maxmutacji);
+                std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, wspselekcji, wsprodzica, maxmutacji, sukcesja);
         }
         case 'm':{  //mrowki!
-            std::cout << mrowki();
+            std::cout << "\n\n znaleziono: " << mrowki();
+            break;
+        }
+        case 's':{
+            sukcesja = !sukcesja;
             break;
         }
         case '0':{  //exit
@@ -319,7 +341,7 @@ void genmenu()
     }
 }
 
-int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild, char mkrzyzowania, char mmutacji, char mselekcji, char mrodzica, int wspkrzyzowania, int wspmutacji, int wspselekcji, int wsprodzica, int maxmutacji)
+int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild, char mkrzyzowania, char mmutacji, char mselekcji, char mrodzica, int wspkrzyzowania, int wspmutacji, int wspselekcji, int wsprodzica, int maxmutacji, bool sukcesja)
 {
 
 
@@ -337,6 +359,9 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //    std::cout << "\n" <<  wsprodzica;
 //    std::cout << "\n" <<  maxmutacji;
 
+    int succession = 0;
+    if(sukcesja == true)
+        succession = popSize;
     int bestCost = INT_MAX;
     int iteration = 0;
     bool keepGoing = true;
@@ -572,7 +597,10 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
                 break;
             }
-            case '2':{  //PMX
+            case '3':{ //HX - bez breaka, hx jest metoda pmx z tylko jednym locusem, wiec ustawiajac locus pmx na ostatnia pozycje dziala tak samo!
+                loc2 = cityamount - 1;
+            }
+            case '2':{ //PMX
 //                std::cout << "\n\nPMX\n\n";
 //
 //                for(int i = 0; i < popSize; i++){
@@ -587,14 +615,16 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
                 for(int i = 0; i < ((popChild / 2) + (popChild % 2)); i++)
                 {
-
 //                    std::cout << "\n krzyzowanie1: " << i;
                     loc1 = rand() % (cityamount - 1) + 1;         //wylosowanie locusow
-                    loc2 = rand() % (cityamount - 1) + 1;
-                    if(loc1 > loc2){
-                        temp = loc1;                              //ustawienie ich w kolejnosci
-                        loc1 = loc2;
-                        loc2 = temp;
+                    if(mkrzyzowania != '3')
+                    {
+                        loc2 = rand() % (cityamount - 1) + 1;
+                        if(loc1 > loc2){
+                            temp = loc1;                              //ustawienie ich w kolejnosci
+                            loc1 = loc2;
+                            loc2 = temp;
+                        }
                     }
                     k1 = 0;             //rodzic numer 1 -> k1 = 0, k2 = 1 ; na koncu petli nastepuje zamiana miejsc
                     k2 = 1;
@@ -604,8 +634,6 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //                         for(int u = 0; u <= cityamount; u++)
 //                            std::cout << " " << newGeneration[(i*2+k1)][u];
 //                        std::cout << "  -pot00omek " << k1 << "\n";
-
-
 
 
                     do{
@@ -723,11 +751,6 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                     }while(esc <= 1 && i < (popChild / 2));
                 }
 //                std::cout << "\nkrzyzowaniewyjsciepmx: " << iteration;
-                break;
-            }
-            case '3':{  //HX
-
-
                 break;
             }
         }
@@ -1110,7 +1133,7 @@ int mrowki() //QAS
         }
     }
     feromon = feromon / ((cityamount - 1) * (cityamount - 1));
-    std::cout << "\n startowy feromon: " << feromon << "\n";
+//    std::cout << "\n startowy feromon: " << feromon << "\n";
 
     int bestCost = INT_MAX;
     int* bestPath = new int[cityamount + 1];
@@ -1118,7 +1141,7 @@ int mrowki() //QAS
     double alfa = 1; // stopien atrakcyjnosci feromonu
     double beta = 3; // stopien atrakcyjnosci krotszej sciezki
     int colonySize = cityamount; // wielkosc koloni
-    int maxIteration = 1;  //ilosc iteracji programu
+    int maxIteration = 100;  //ilosc iteracji programu
     char choice;
     int tmp = 0;
     int tmp2 = 0;
@@ -1176,47 +1199,58 @@ int mrowki() //QAS
     {
         for(int i = 0; i < (cityamount - 1); i++) // i - pozycja w sekwencji miast ktora jest aktualnie opracowywana
         {
-            for(int j = 0; j < colonySize; j++) // j - nr aktualnie opracowywanej mrowki
+            if(i == (cityamount - 2))
             {
-                tmpMax = 0.0;     //to bedzie caly przedzial losowania
-                temp2 = 0.0;
-                for(int k = 0; k < cityamount; k++) //wyliczanie wszystkich przejsc do nastepnych miast
-                {
-                    if(antTabu[j][k] == false){
-//                        temp = distances[antPath[j][i]][k];
-//                        std::cout << "2: " << pow(phTab[j][k], alfa) << " " << pow(distances[antPath[j][i]][k], beta) ;
-                        tmpMax += pow(phTab[j][k], alfa) / pow( distances[antPath[j][i]][k], beta);}
-                }
-                std::cout << "\n tmpMax: " << tmpMax ;
-                for(rzad = 0; tmpMax < 10000; rzad++) // sprawdzanie rzedu wielkosci, niezbedne do losowania
-                    tmpMax = tmpMax * 10;
-                std::cout << " rzad: " << rzad << " nowe tmpMax: " << tmpMax;
-
-                tmp3 = tmpMax;
-                tmpLos = rand() % tmp3;     //losujemy miasto z okreslonym prawdopodobienstwem
-                std::cout << " tmp los:  " << tmpLos << "\n";
-
-                tmp2 = 0;
-                x = 0;
-
-                do{
-                    if(antTabu[j][x] == false){
-                        temp = pow(phTab[j][x], alfa) / pow(distances[antPath[j][i]][x], beta);
-                        temp2 += temp * pow(10, rzad);
-                        tmp2 = temp2;
+                for(int j = 0; j < colonySize; j++){
+                    for(int k = 0; k < cityamount; k++)
+                    {
+                        if(antTabu[j][k] == false && k != antPath[j][cityamount])
+                            antPath[j][i + 1] = k;
                     }
-                    x++;
-                    std::cout << "   " << temp2;
-                }while(tmp2 < tmpLos);
-                antTabu[j][x - 1] = true;
-                antPath[j][i + 1] = x - 1;
-
-                std::cout << "\n mrowka: " << j << " wykonuje przejscie z: " << antPath[j][i] << " do: " << antPath[j][i + 1] << " pokonujac przy tym: " << distances[antPath[j][i]][antPath[j][i + 1]] << " nowy vBool: \n";
-                for(int o = 0; o < cityamount; o++)
-                    std::cout << " " << antTabu[j][o];
-
+                }
             }
-            std::cout << "\n\n nowa fala";
+            else
+            {
+                for(int j = 0; j < colonySize; j++) // j - nr aktualnie opracowywanej mrowki
+                {
+                    tmpMax = 0.0;     //to bedzie caly przedzial losowania
+                    temp2 = 0.0;
+                    for(int k = 0; k < cityamount; k++) //wyliczanie wszystkich przejsc do nastepnych miast
+                    {
+                        if(antTabu[j][k] == false){
+                            tmpMax += pow(phTab[j][k], alfa) / pow( distances[antPath[j][i]][k], beta);}
+                    }
+    //                std::cout << "\n tmpMax: " << tmpMax ;
+                    for(rzad = 0; tmpMax < 10000; rzad++) // sprawdzanie rzedu wielkosci, niezbedne do losowania
+                        tmpMax = tmpMax * 10;
+    //                std::cout << " rzad: " << rzad << " nowe tmpMax: " << tmpMax;
+
+                    tmp3 = tmpMax;
+                    tmpLos = rand() % tmp3;     //losujemy miasto z okreslonym prawdopodobienstwem
+    //                std::cout << " tmp los:  " << tmpLos << "\n";
+
+                    tmp2 = 0;
+                    x = 0;
+
+                    do{
+                        if(antTabu[j][x] == false){
+                            temp = pow(phTab[j][x], alfa) / pow(distances[antPath[j][i]][x], beta);
+                            temp2 += temp * pow(10, rzad);
+                            tmp2 = temp2;
+                        }
+                        x++;
+    //                    std::cout << "   " << temp2;
+                    }while(tmp2 < tmpLos);
+                    antTabu[j][x - 1] = true;
+                    antPath[j][i + 1] = x - 1;
+
+    //                std::cout << "\n mrowka: " << j << " wykonuje przejscie z: " << antPath[j][i] << " do: " << antPath[j][i + 1] << " pokonujac przy tym: " << distances[antPath[j][i]][antPath[j][i + 1]] << " nowy vBool: \n";
+    //                for(int o = 0; o < cityamount; o++)
+    //                    std::cout << " " << antTabu[j][o];
+
+                }
+            }
+//            std::cout << "\n\n nowa fala";
 
             for(int j = 0; j < cityamount; j++)   //pomnozenie ilosci feromonu na sciezkach przez evap
                 for(int k = 0; k < cityamount; k++)
@@ -1225,16 +1259,16 @@ int mrowki() //QAS
 
             for(int j = 0; j < colonySize; j++){ // j - nr aktualnie opracowywanej mrowki
                 tempD = feromon / distances[antPath[j][i]][antPath[j][i + 1]];
-                std::cout << "\n do: " << phTab[antPath[j][i]][antPath[j][i + 1]] << " tempD: " << feromon << " / " << distances[antPath[j][i]][antPath[j][i + 1]] << " wiec dodajemy " << (feromon * tempD);
+//                std::cout << "\n do: " << phTab[antPath[j][i]][antPath[j][i + 1]] << " tempD: " << feromon << " / " << distances[antPath[j][i]][antPath[j][i + 1]] << " wiec dodajemy " << (feromon * tempD);
                 phTab[antPath[j][i]][antPath[j][i + 1]] += (feromon * tempD); //dodawanie feromonu tam gdzie bylo przejscie: feromon * (feromon/distances[][])
             }
 
-            std::cout << "\n sprawdzenie: ";
-            for(int j = 0; j < cityamount; j++){  // sprawdzanie
-                for(int k = 0; k < cityamount; k++)
-                    if(phTab[j][k] != phTab[0][0])
-                        std::cout << "\n Dla mrowki: " << j << " na pozycji " << k << " nowy feromon wynosi: " << phTab[j][k];
-            }
+//            std::cout << "\n sprawdzenie: ";
+//            for(int j = 0; j < cityamount; j++){  // sprawdzanie
+//                for(int k = 0; k < cityamount; k++)
+//                    if(phTab[j][k] != phTab[0][0])
+//                        std::cout << "\n Dla mrowki: " << j << " na pozycji " << k << " nowy feromon wynosi: " << phTab[j][k];
+//            }
 
         }
 
@@ -1249,29 +1283,37 @@ int mrowki() //QAS
 
         //obliczanie drogi i zerowanie tabu oraz znajdowanie bestpath i bestcost
 
-        for(int j = 0; j < colonySize; j++){    //nr mrowki
+        for(int j = 0; j < colonySize; j++){    //nr mrowki / liczenie kosztu sekwencji
             tmp = 0;
             for(int k = 0; k < cityamount; k++){    //nr miasta w seq
                 tmp += distances[antPath[j][k]][antPath[j][k + 1]];
             }
+
+//            std::cout << "\n zkoszt: " << tmp << " seq: ";  // wypisywanie wynikow
+//            for(int k = 0; k <= cityamount; k++)
+//                std::cout << " " << antPath[j][k];
+
             if(tmp < bestCost){
                 bestCost = tmp;
                 for(int k = 0; k <= cityamount; k++)
                     bestPath[k] = antPath[j][k];
             }
+            if(tmp > 100000)
+            {
+                std::cout << "\n\npopsute\n\n";
+                for(int k = 0; k < cityamount; k++)
+                    std::cout << " " << antTabu[j][k];
+            }
+
+
+
         }
 
         for(int j = 0; j < colonySize; j++)
             for(int k = 0; k < cityamount; k++)
                 antTabu[j][k] = false;
 
-        //sprawdzamy czy distanceToTravel == 0
-        //jesli tak, to sprawdzenie czy mrowka nie przeszla juz wszystkich miast
-        //jesli tak to sprawdzamy sekwencje pod katem bestcost i ja zerujemy - anttabu,antpath(zeruje sie samo), anountofvisited
-        //jesli nie to po prostu wylosowanie nowego miasta dla mrowki, chyba ze zostalo jej ostatnie, wtedy zawsze je losuje
-        //jesli ani to ani to, mrowka jest pomijana
-
-        //aktualizacja ilosci feromonu na sciezkach, ilosc dodawanego feromonu to x/dlugosc sciezki
+        std::cout << "\n\n iteracja nr" << q << " zakonczona!\n\n\n";
     }
 
     std::cout << "\n\n Najlepszy znaleziony wynik: " << bestCost << " zostal otrzymany jako wynik sekwencji: \n";
