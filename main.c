@@ -1,10 +1,11 @@
 // Dodatkowe rzeczy:
+//- sukcesja on/off
 //- pierwsze 1/3 sekwencji miast jest generowana losowo, reszta za pomocą Greedy
-//- 4 metody selekcji rodzicow: ruletka, losowa, turniejowa, rangowa
-//- 3 metody krzyzowania: PMX, OX, HX
-//- 4 metody mutacji: insert, invert, swap, scramble
-//- 3 metody selekcji osobnikow: ruletka, ranking, turniej, rangi
-//- 3 warunki stopu: czas, ilosc iteracji, ilosc iteracji bez poprawienia bestCost
+//- 3 metody selekcji rodzicow: ruletka, losowa, turniejowa,
+//- 2 metody krzyzowania: PMX, HX
+//- 3 metody mutacji: insert, invert, swap
+//- 3 metody selekcji osobnikow: ruletka, ranking, turniej
+//- 2 warunki stopu: czas, ilosc iteracji
 
 // blad we wzorze na prawdopodobienstwo w prezentacji dr Kaplona
 
@@ -107,10 +108,10 @@ void genmenu()
     int maxiteration = 100;
     int ttime = 4;
     int popSize = 60;
-    int popChild = 21;
+    int popChild = 80;
     char mkrzyzowania = '2';
     char mmutacji = '3';
-    char mselekcji = '3';
+    char mselekcji = '2';
     char mrodzica = '3';
     int wspkrzyzowania = 80;
     int wspmutacji = 1;
@@ -303,7 +304,7 @@ void genmenu()
         }
         case '9':{  //AG exe
             if((sukcesja == true && popSize >= popChild) || (mrodzica == '3' && wsprodzica >= (popSize/2)) || (mselekcji == '3' && wspselekcji >= (popSize/2)))
-                std::cout << "\n\n\ Jakis warunek jest popsuty, wprowadz poprawne dane!\n";
+                std::cout << "\n\n\ Jakis warunek jest popsuty, wprowadz poprawne dane! \n";
             else
                 std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, wspselekcji, wsprodzica, maxmutacji, sukcesja);
             break;
@@ -584,16 +585,16 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
                 break;
             }
-            case '4':{  //rangowa liniowa
-
-                break;
-            }
+//            case '4':{  //rangowa liniowa
+//
+//                break;
+//            }
         }
 
 
         std::cout << "\n krzyzowanie: " << iteration;
         switch(mkrzyzowania){
-            case '1':{  //OX
+            case '1':{ //OX
 
                 break;
             }
@@ -896,11 +897,24 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
         std::cout << "\n selekcja: " << iteration << "\n";
 
+
+
+        if(sukcesja == true){   // w przypadku sukcesji ustawiamy wszystkich rodzicow w kolejce do nadpisania
+            for(int i = 0; i < popSize; i++)
+                bAllPop[i] = true;
+            for(int i = 0; i < popChild; i++)
+                bAllPop[i + popSize] = false;
+        }
+        else
+            for(int j = 0; j < popSize + popChild; j++)    //zerowanie tablicy osobnikow do usuniecia
+                bAllPop[j] = false;
+
+
         switch(mselekcji){
             case '1':{  //kola ruletki
 //                allPaths = 0;
-                for(int j = 0; j < popSize + popChild; j++)    //zerowanie tablicy osobnikow do usuniecia
-                    bAllPop[j] = false;
+//                for(int j = 0; j < popSize + popChild; j++)    //zerowanie tablicy osobnikow do usuniecia
+//                    bAllPop[j] = false;
 
                 specimenMaxValue = INT_MAX;
                 for(int i = 0; i < popSize; i++)            //znajdowanie najkrotszej sciezki w populacji
@@ -919,7 +933,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
 //                std::cout << "\n allpaths: " << allPaths <<"\n\n";
 
-                for(int i = 0; i < popChild; i++){
+                for(int i = 0; i < (popChild - succession); i++){
 
                     allPaths = 0;
                     for(int i = 0; i < popSize; i++)            //obliczanie szansy na rozmnozenie na podstawie wartosci o ktora jest osobnik gorszy od najlepszej sciezki
@@ -965,14 +979,50 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                 break;
             }
             case '2':{  //ranking
+                for(int i = succession; i < popSize + popChild; i++)
+                    allPopOperator[i] = i;
+
+                std::cout << "\n";
+                for(int i = 0; i < popChild + popSize; i++)
+                    std::cout << " " << allPopOperator[i];
+
+                for(int i = (popSize + popChild - 1); i > succession; i--)
+                {
+                    for(int j = succession; j < i; j++)
+                    {
+                        if(allPopOperator[j] >= popSize){    //uwzglednianie 2 tabel
+                            k1 = childValue[allPopOperator[j] - popSize];}
+                        else{
+                            k1 = specimenValue[allPopOperator[j]];}
+                        if(allPopOperator[j + 1] >= popSize){
+                            k2 = childValue[allPopOperator[j + 1] - popSize];}
+                        else{
+                            k2 = specimenValue[allPopOperator[j + 1]];}
+
+
+                        if(k1 < k2)
+                        {
+                            tmp = allPopOperator[j];
+                            allPopOperator[j] = allPopOperator[j + 1];
+                            allPopOperator[j + 1] = tmp;
+                        }
+
+
+                    }
+                }
+                std::cout << "\n";
+                for(int i = 0; i < popChild + popSize; i++)
+                    std::cout << " " << allPopOperator[i];
+                for(int i = succession; i < popChild; i++)
+                    bAllPop[allPopOperator[i]] = true;
 
                 break;
             }
             case '3':{  //turniejowa
-                for(int j = 0; j < popSize + popChild; j++)    //zerowanie tablicy
-                    bAllPop[j] = false;
+//                for(int j = 0; j < popSize + popChild; j++)    //zerowanie tablicy
+//                    bAllPop[j] = false;
 
-                for(int i = 0; i < popChild; i++)
+                for(int i = 0; i < popChild - succession; i++)
                 {
                     for(int j = 0; j < popSize + popChild; j++)    //zerowanie tablicy
                         bAllPop2[j] = false;
@@ -1010,10 +1060,10 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                     std::cout << "\n\n\n\n POPSULEM TURNIEJ!!! \n temp: " << temp << "\n\n\n\n";
                 break;
             }
-            case '4':{  //rangowa
-
-                break;
-            }
+//            case '4':{  //rangowa
+//
+//                break;
+//            }
         }
 
 //        std::cout << "\n";
@@ -1075,8 +1125,6 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
 
         end = clock();
-
-        //////////////////////////////////////////////////////////warunek konca od ilosci bezowocnych iteracji///////////////////////////////////////
 
         if((kstopu == '1' && double(end - begin) / CLOCKS_PER_SEC > ttime) || (kstopu == '3' && double(end - begin) / CLOCKS_PER_SEC > ttime))
             {keepGoing = false;
@@ -1152,7 +1200,6 @@ int mrowki() //QAS
     double temp = 0.0;
     double tempD = 0.0;
     double temp2 = 0.0;
-    double temp3 = 0.0;
     int rzad = 0;
 
     std::cout << "\n\n Algorytm mrowkowy:\n Czy chcesz wprowadzic wlasne parametry? (y. = tak): ";
