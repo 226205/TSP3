@@ -105,10 +105,10 @@ void genmenu()
 {
     bool sukcesja = false;
     int kstopu = '2';
-    int maxiteration = 1;
+    int maxiteration = 100;
     int ttime = 4;
-    int popSize = 10;
-    int popChild = 4;
+    int popSize = 200;
+    int popChild = 200;
     char mkrzyzowania = '1';
     char mmutacji = '4';
     char mselekcji = '2';
@@ -136,6 +136,9 @@ void genmenu()
         if(mmutacji == '1') std::cout << "\n Metoda mutacji: insert";
         if(mmutacji == '2') std::cout << "\n Metoda mutacji: invert";
         if(mmutacji == '3') std::cout << "\n Metoda mutacji: swap";
+        if(mmemetic == '1') std::cout << "\n Algorytm memetyczny: insert";
+        if(mmemetic == '2') std::cout << "\n Algorytm memetyczny: swap";
+        if(mmemetic == '3') std::cout << "\n Algorytm memetyczny: invert";
         std::cout << "\n Wspolczynnik mutacji: " << wspmutacji;
         std::cout << "\n Maksymalna ilosc mutacji: " << maxmutacji;
         if(mselekcji == '1') std::cout << "\n Metoda selekcji osobnikow: kola ruletki";
@@ -836,71 +839,22 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
             }
         }
 
-
-//
-//        if(mmemetic == '1' || mmemetic == '2')          // algorytm memetyczny
-//        {
-//            for(int q = 0; q < popChild; q++){          // sprawdzany dla kazdego dziecka
-//                tmp = INT_MAX; //Najmniejszy osiagniety przez nas wynik
-////                std::cout << "\n stara sekwencja potomka nr: " << q << "    ";
-////                for(int i = 0; i <= cityamount; i++)
-////                    std::cout << " " << newGeneration[q][i];
-//
-//                for(int i = 1; i < cityamount-1; i++){
-//                    for(int j = i+1; j < cityamount; j++){
-//
-//                        // wyliczanie roznicy w koszcie, obliczajac jedynie roznice miedzy sciezkami bedacymi czesciami zamienionych miast
-//                        if((mmemetic == '2' && (i+1 == j)) || mmemetic == '1'){
-//                            tmp2 = distances[newGeneration[q][i-1]][newGeneration[q][j]] + distances[newGeneration[q][j]][newGeneration[q][i]] + distances[newGeneration[q][i]][newGeneration[q][j+1]] - distances[newGeneration[q][i-1]][newGeneration[q][i]] - distances[newGeneration[q][i]][newGeneration[q][j]] - distances[newGeneration[q][j]][newGeneration[q][j+1]];
-////                            std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]]  << " + " << distances[newGeneration[q][j]][newGeneration[q][i]] << " + " << distances[newGeneration[q][i]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][i]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
-//                        }
-//                        if(mmemetic == '2' && (i+1 != j)){
-//                            tmp2 = distances[newGeneration[q][i-1]][newGeneration[q][j]] + distances[newGeneration[q][j]][newGeneration[q][i+1]] + distances[newGeneration[q][j-1]][newGeneration[q][i]] + distances[newGeneration[q][i]][newGeneration[q][j+1]] - distances[newGeneration[q][i-1]][newGeneration[q][i]] - distances[newGeneration[q][i]][newGeneration[q][i+1]] - distances[newGeneration[q][j-1]][newGeneration[q][j]] - distances[newGeneration[q][j]][newGeneration[q][j+1]];
-////                            std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]] << " + " << distances[newGeneration[q][j]][newGeneration[q][i+1]] << " + " << distances[newGeneration[q][j-1]][newGeneration[q][i]] << " + " << distances[newGeneration[q][i]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][i]][newGeneration[q][i+1]] << " - " << distances[newGeneration[q][j-1]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
-//                        }
-//
-//                        if(tmp2 < tmp){                                             //sprawdzenie czy wygenerowany sasiad jest lepszy od juz sprawdzonych
-//                            k1 = i;
-//                            k2 = j;
-//                            tmp = tmp2;
-//                        }
-//                    }
-//                }
-//                if(tmp < 0)
-//                {
-//                    temp = newGeneration[q][k1];                               //zamiana najlepszych miast miejscami
-//                    newGeneration[q][k1] = newGeneration[q][k2];
-//                    newGeneration[q][k2] = temp;
-////
-////                    if(mmemetic == '1')
-////                        std::cout << "\n zamieniono pozycje miasta na pozycji: " << k1 << " na pozycje " << k2 << " czyli miasta " << newGeneration[q][k2] << " na miasto " << newGeneration[q][k1] << " co pozwolilo nam zmodyfikowac dlugosc trasy o: " << tmp;
-////                    if(mmemetic == '2')
-////                        std::cout << "\n zamieniono miejscami miasta na pozycjach: " << k1 << " oraz " << k2 << " czyli miasta " << newGeneration[q][k2] << " oraz " << newGeneration[q][k1] << " co pozwolilo nam zmodyfikowac dlugosc trasy o: " << tmp;
-////                    std::cout << "\n nowa sekwencja potomka nr: " << q << "    ";
-////                    for(int i = 0; i <= cityamount; i++)
-////                        std::cout << " " << newGeneration[q][i];
-//                }
-////                else
-////                    std::cout << "\n nie warto przeprowadzac zadnych zmian.";
-//            }
-//        }
-
         switch(mmemetic){
             case '1':{  //insert
 
                 for(int q = 0; q < popChild; q++){
                     tmp = INT_MAX; //Najmniejszy osiagniety przez nas wynik
-                    std::cout << "\n stara sekwencja potomka nr: " << q << "    ";
-                    for(int i = 0; i <= cityamount; i++)
-                        std::cout << " " << newGeneration[q][i];
+//                    std::cout << "\n stara sekwencja potomka nr: " << q << "    ";
+//                    for(int i = 0; i <= cityamount; i++)
+//                        std::cout << " " << newGeneration[q][i];
 
                     for(int i = 1; i < cityamount; i++){
                         for(int j = 1; j < cityamount; j++){
                             if(i < j)
                             {
-//                                tmp2 = 0;       // wyliczanie roznicy w koszcie, obliczajac jedynie roznice miedzy sciezkami bedacymi czesciami zamienionych miast
+                            // wyliczanie roznicy w koszcie, obliczajac jedynie roznice miedzy sciezkami bedacymi czesciami zamienionych miast
                                 tmp2 = distances[newGeneration[q][i-1]][newGeneration[q][j]] + distances[newGeneration[q][j]][newGeneration[q][i]] + distances[newGeneration[q][j-1]][newGeneration[q][j+1]] - distances[newGeneration[q][i-1]][newGeneration[q][i]] - distances[newGeneration[q][j-1]][newGeneration[q][j]] - distances[newGeneration[q][j]][newGeneration[q][j+1]];
-                                std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]]  << " + " << distances[newGeneration[q][j]][newGeneration[q][i]] << " + " << distances[newGeneration[q][j-1]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][j-1]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
+//                                std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]]  << " + " << distances[newGeneration[q][j]][newGeneration[q][i]] << " + " << distances[newGeneration[q][j-1]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][j-1]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
 
                                 if(tmp2 < tmp){         //sprawdzenie czy wygenerowany sasiad jest lepszy od juz sprawdzonych
                                     k1 = i;
@@ -912,7 +866,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                             {
 //                                tmp2 = 0;       // wyliczanie roznicy w koszcie, obliczajac jedynie roznice miedzy sciezkami bedacymi czesciami zamienionych miast
                                 tmp2 = distances[newGeneration[q][j-1]][newGeneration[q][j+1]] + distances[newGeneration[q][i]][newGeneration[q][j]] + distances[newGeneration[q][j]][newGeneration[q][i+1]] - distances[newGeneration[q][j-1]][newGeneration[q][j]] - distances[newGeneration[q][j]][newGeneration[q][j+1]] - distances[newGeneration[q][i]][newGeneration[q][i+1]];
-                                std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][j-1]][newGeneration[q][j+1]]  << " + " << distances[newGeneration[q][i]][newGeneration[q][j]] << " + " << distances[newGeneration[q][j]][newGeneration[q][i+1]] << " - " << distances[newGeneration[q][j-1]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i]][newGeneration[q][i+1]];
+//                                std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][j-1]][newGeneration[q][j+1]]  << " + " << distances[newGeneration[q][i]][newGeneration[q][j]] << " + " << distances[newGeneration[q][j]][newGeneration[q][i+1]] << " - " << distances[newGeneration[q][j-1]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i]][newGeneration[q][i+1]];
 
                                 if(tmp2 < tmp){         //sprawdzenie czy wygenerowany sasiad jest lepszy od juz sprawdzonych
                                     k1 = i;
@@ -940,13 +894,13 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                         }
 
 
-                        std::cout << "\n zamieniono pozycje miasta na pozycji: " << k1 << " na pozycje " << k2 << " czyli miasta " << newGeneration[q][k2] << " na miasto " << newGeneration[q][k1] << " co pozwolilo nam zmodyfikowac dlugosc trasy o: " << tmp;
-                        std::cout << "\n nowa sekwencja potomka nr: " << q << "    ";
-                        for(int i = 0; i <= cityamount; i++)
-                            std::cout << " " << newGeneration[q][i];
+//                        std::cout << "\n zamieniono pozycje miasta na pozycji: " << k1 << " na pozycje " << k2 << " czyli miasta " << newGeneration[q][k2] << " na miasto " << newGeneration[q][k1] << " co pozwolilo nam zmodyfikowac dlugosc trasy o: " << tmp;
+//                        std::cout << "\n nowa sekwencja potomka nr: " << q << "    ";
+//                        for(int i = 0; i <= cityamount; i++)
+//                            std::cout << " " << newGeneration[q][i];
                     }
-                    else
-                        std::cout << "\n nie warto przeprowadzac zadnych zmian.";
+//                    else
+//                        std::cout << "\n nie warto przeprowadzac zadnych zmian.";
                 }
 
 
@@ -956,9 +910,9 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 
                 for(int q = 0; q < popChild; q++){
                     tmp = INT_MAX; //Najmniejszy osiagniety przez nas wynik
-                    std::cout << "\n stara sekwencja potomka nr: " << q << "    ";
-                    for(int i = 0; i <= cityamount; i++)
-                        std::cout << " " << newGeneration[q][i];
+//                    std::cout << "\n stara sekwencja potomka nr: " << q << "    ";
+//                    for(int i = 0; i <= cityamount; i++)
+//                        std::cout << " " << newGeneration[q][i];
 
                     for(int i = 1; i < cityamount-1; i++){
                         for(int j = i+1; j < cityamount; j++){
@@ -966,11 +920,11 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //                            tmp2 = 0;       // wyliczanie roznicy w koszcie, obliczajac jedynie roznice miedzy sciezkami bedacymi czesciami zamienionych miast
                             if(i + 1 == j){
                                 tmp2 = distances[newGeneration[q][i-1]][newGeneration[q][j]] + distances[newGeneration[q][j]][newGeneration[q][i]] + distances[newGeneration[q][i]][newGeneration[q][j+1]] - distances[newGeneration[q][i-1]][newGeneration[q][i]] - distances[newGeneration[q][i]][newGeneration[q][j]] - distances[newGeneration[q][j]][newGeneration[q][j+1]];
-                                std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]]  << " + " << distances[newGeneration[q][j]][newGeneration[q][i]] << " + " << distances[newGeneration[q][i]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][i]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
+//                                std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]]  << " + " << distances[newGeneration[q][j]][newGeneration[q][i]] << " + " << distances[newGeneration[q][i]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][i]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
                             }
                             else{
                                 tmp2 = distances[newGeneration[q][i-1]][newGeneration[q][j]] + distances[newGeneration[q][j]][newGeneration[q][i+1]] + distances[newGeneration[q][j-1]][newGeneration[q][i]] + distances[newGeneration[q][i]][newGeneration[q][j+1]] - distances[newGeneration[q][i-1]][newGeneration[q][i]] - distances[newGeneration[q][i]][newGeneration[q][i+1]] - distances[newGeneration[q][j-1]][newGeneration[q][j]] - distances[newGeneration[q][j]][newGeneration[q][j+1]];
-                                std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]] << " + " << distances[newGeneration[q][j]][newGeneration[q][i+1]] << " + " << distances[newGeneration[q][j-1]][newGeneration[q][i]] << " + " << distances[newGeneration[q][i]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][i]][newGeneration[q][i+1]] << " - " << distances[newGeneration[q][j-1]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
+//                                std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]] << " + " << distances[newGeneration[q][j]][newGeneration[q][i+1]] << " + " << distances[newGeneration[q][j-1]][newGeneration[q][i]] << " + " << distances[newGeneration[q][i]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][i]][newGeneration[q][i+1]] << " - " << distances[newGeneration[q][j-1]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
                             }
 
                             if(tmp2 < tmp){                                             //sprawdzenie czy wygenerowany sasiad jest lepszy od juz sprawdzonych
@@ -986,13 +940,61 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                         newGeneration[q][k1] = newGeneration[q][k2];
                         newGeneration[q][k2] = temp;
 
-                        std::cout << "\n zamieniono miejscami miasta na pozycjach: " << k1 << " oraz " << k2 << " czyli miasta " << newGeneration[q][k2] << " oraz " << newGeneration[q][k1] << " co pozwolilo nam zmodyfikowac dlugosc trasy o: " << tmp;
-                        std::cout << "\n nowa sekwencja potomka nr: " << q << "    ";
-                        for(int i = 0; i <= cityamount; i++)
-                            std::cout << " " << newGeneration[q][i];
+//                        std::cout << "\n zamieniono miejscami miasta na pozycjach: " << k1 << " oraz " << k2 << " czyli miasta " << newGeneration[q][k2] << " oraz " << newGeneration[q][k1] << " co pozwolilo nam zmodyfikowac dlugosc trasy o: " << tmp;
+//                        std::cout << "\n nowa sekwencja potomka nr: " << q << "    ";
+//                        for(int i = 0; i <= cityamount; i++)
+//                            std::cout << " " << newGeneration[q][i];
                     }
-                    else
-                        std::cout << "\n nie warto przeprowadzac zadnych zmian.";
+//                    else
+//                        std::cout << "\n nie warto przeprowadzac zadnych zmian.";
+                }
+                break;
+            }
+
+            case '3':{  // invert - daje slabe wyniki!!!
+
+                for(int q = 0; q < popChild; q++){
+                    tmp = INT_MAX; //Najmniejszy osiagniety przez nas wynik
+//                    std::cout << "\n stara sekwencja potomka nr: " << q << "    ";
+//                    for(int i = 0; i <= cityamount; i++)
+//                        std::cout << " " << newGeneration[q][i];
+
+                    for(int i = 1; i < cityamount-1; i++){
+                        for(int j = i+1; j < cityamount; j++){
+
+                            tmp2 = 0;
+                            for(int y = i; y <= (j+1); y++)
+                                tmp2 -= distances[newGeneration[q][y-1]][newGeneration[q][y]];
+                            for(int y = i; y < j; y++)
+                                tmp2 += distances[newGeneration[q][y+1]][newGeneration[q][y]];
+                            tmp2 += distances[newGeneration[q][i-1]][newGeneration[q][j]];
+                            tmp2 += distances[newGeneration[q][i]][newGeneration[q][j+1]];
+
+
+                            if(tmp2 < tmp){                    //sprawdzenie czy wygenerowany sasiad jest lepszy od juz sprawdzonych
+                                k1 = i;
+                                k2 = j;
+                                tmp = tmp2;
+                            }
+                        }
+                    }
+                    if(tmp < 0)             //zamiana najlepszych miast miejscami
+                    {
+                        for(int z = k1; z < k2; z++)
+                        {
+                            temp = newGeneration[q][k1 + z];
+                            newGeneration[q][k1 + z] = newGeneration[q][k1 + z + 1];
+                            newGeneration[q][k1 + z +1] = temp;
+                        }
+
+
+//                        std::cout << "\n zamieniono miejscami miasta na pozycjach: " << k1 << " oraz " << k2 << " czyli miasta " << newGeneration[q][k2] << " oraz " << newGeneration[q][k1] << " co pozwolilo nam zmodyfikowac dlugosc trasy o: " << tmp;
+//                        std::cout << "\n nowa sekwencja potomka nr: " << q << "    ";
+//                        for(int i = 0; i <= cityamount; i++)
+//                            std::cout << " " << newGeneration[q][i];
+                    }
+//                    else
+//                        std::cout << "\n nie warto przeprowadzac zadnych zmian.";
                 }
                 break;
             }
