@@ -25,7 +25,7 @@ void chosingfile();
 bool fileread(std::string);
 void writetab(int**);
 void genmenu();
-int genetical(int, int, int, int, int, char, char, char, char, int, int, int, int, int, bool);
+int genetical(int, int, int, int, int, char, char, char, char, int, int, int, int, int, bool, char, int);
 int mrowki();
 
 
@@ -105,19 +105,21 @@ void genmenu()
 {
     bool sukcesja = false;
     int kstopu = '2';
-    int maxiteration = 100;
+    int maxiteration = 1;
     int ttime = 4;
-    int popSize = 60;
-    int popChild = 80;
-    char mkrzyzowania = '2';
-    char mmutacji = '3';
+    int popSize = 10;
+    int popChild = 4;
+    char mkrzyzowania = '1';
+    char mmutacji = '4';
     char mselekcji = '2';
-    char mrodzica = '3';
+    char mrodzica = '1';
     int wspkrzyzowania = 80;
     int wspmutacji = 1;
-    int wspselekcji = 4;
-    int wsprodzica = 4;
+    int wspselekcji = 10;
+    int wsprodzica = 250;
     int maxmutacji = 1;
+    char mmemetic = '1';
+    int wspmemetic = 10;
 
     int choice = -1;
     char choice2;
@@ -161,6 +163,7 @@ void genmenu()
         std::cout << "\n9: Algorytm Genetyczny";
         std::cout << "\n0. Wyjscie ";
         std::cout << "\nt. Wielokrotne Testowanie Algorytmu";
+        std::cout << "\na. Wybieranie Algorytmu Memetycznego";
         std::cout << "\nm. Algorytm Mrowkowy";
         std::cout << "\nTwoj wybor: ";
 
@@ -229,10 +232,11 @@ void genmenu()
                 std::cout << "\n 1. insert";
                 std::cout << "\n 2. invert";
                 std::cout << "\n 3. swap";
+                std::cout << "\n 4. brak mutacji";
                 std::cout << "\n Twoj wybor: ";
                 mmutacji = getche();
-                if(mmutacji != '1' && mmutacji != '2' && mmutacji != '3') std::cout << "\n Nie ma takiej metody! Sprobuj ponownie!";
-            } while (mmutacji != '1' && mmutacji != '2' && mmutacji != '3');
+                if(mmutacji != '1' && mmutacji != '2' && mmutacji != '3' && mmutacji != '4') std::cout << "\n Nie ma takiej metody! Sprobuj ponownie!";
+            } while (mmutacji != '1' && mmutacji != '2' && mmutacji != '3' && mmutacji != '4');
             do {
                 std::cout << "\n\n Podaj wartosc wspolczynnika mutacji (zakres 0-100): ";
                 std::cin >> wspmutacji;
@@ -306,7 +310,7 @@ void genmenu()
             if((sukcesja == true && popSize >= popChild) || (mrodzica == '3' && wsprodzica >= (popSize/2)) || (mselekcji == '3' && wspselekcji >= (popSize/2)))
                 std::cout << "\n\n\ Jakis warunek jest popsuty, wprowadz poprawne dane! \n";
             else
-                std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, wspselekcji, wsprodzica, maxmutacji, sukcesja);
+                std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, wspselekcji, wsprodzica, maxmutacji, sukcesja, mmemetic, wspmemetic);
             break;
         }
         case 't':{  //multi AG exes
@@ -317,8 +321,28 @@ void genmenu()
                 if(testin <= 0) std::cout << "\n liczba prob musi byc wieksza od zera! Sprobuj ponownie!";
             }while(testin <= 0);
 
+            clock_t begin = clock();
+            std::clock_t end = clock();
             for(int k = 0; k < testin; k++)
-                std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, wspselekcji, wsprodzica, maxmutacji, sukcesja);
+                std::cout << "\n\n " << genetical(kstopu, maxiteration, ttime, popSize, popChild, mkrzyzowania, mmutacji, mselekcji, mrodzica, wspkrzyzowania, wspmutacji, wspselekcji, wsprodzica, maxmutacji, sukcesja, mmemetic, wspmemetic);
+            std::cout<<"\n\n\nCzas wykonania proby: " << double(end - begin) / CLOCKS_PER_SEC;
+            break;
+        }
+        case 'a':{  //MemeticAlgoritm
+            do {
+                std::cout << "\n\n Wybierz metode wykonania algorytmu memetycznego z ponizszych: ";
+                std::cout << "\n 1. insert";
+                std::cout << "\n 2. swap";
+                std::cout << "\n Twoj wybor: ";
+                mmutacji = getche();
+                if(mmemetic != '1' && mmemetic != '2' && mmemetic != '3') std::cout << "\n Nie ma takiej metody! Sprobuj ponownie!";
+            } while (mmemetic != '1' && mmemetic != '2' && mmemetic != '3');
+            do {
+                std::cout << "\n\n Podaj wartosc wspolczynnika mutacji (zakres 0-100): ";
+                std::cin >> wspmutacji;
+                if(wspmemetic <= 0 || wspmemetic >= 100) std::cout << "\n Wspolczynnik mutacji musi byc wiekszy od zera! Sprobuj ponownie!";
+            } while (wspmemetic <= 0 || wspmemetic >= 100);;
+            break;
         }
         case 'm':{  //mrowki!
             std::cout << "\n\n znaleziono: " << mrowki();
@@ -342,7 +366,7 @@ void genmenu()
     }
 }
 
-int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild, char mkrzyzowania, char mmutacji, char mselekcji, char mrodzica, int wspkrzyzowania, int wspmutacji, int wspselekcji, int wsprodzica, int maxmutacji, bool sukcesja)
+int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild, char mkrzyzowania, char mmutacji, char mselekcji, char mrodzica, int wspkrzyzowania, int wspmutacji, int wspselekcji, int wsprodzica, int maxmutacji, bool sukcesja, char mmemetic, int wspmemetic)
 {
 
 
@@ -464,7 +488,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
     {
         iteration++;
 
-        std::cout << "\n switch: " << iteration;
+//        std::cout << "\n switch: " << iteration;
         switch(mrodzica){
 
             case '1':{  //kola ruletki
@@ -499,12 +523,12 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //                                std::cout << "\n tmp: " << tmp << " tmp2: " << tmp2 << " maxrand: " << allPaths << " specimenMaxValue: " << specimenMaxValue << " specimenValue[j]: "  << specimenValue[j];
                             }
                         }
-                        if(tmp2 > tmp + 1000000){     //sprawdzenie
-                            std::cout << "\n";
-                            for(int w = 0; w <= cityamount; w++)
-                                std::cout << " " << oldGeneration[i][w];
-                            std::cout << " value: " << specimenValue;
-                        }
+//                        if(tmp2 > tmp + 1000000){     //sprawdzenie
+//                            std::cout << "\n";
+//                            for(int w = 0; w <= cityamount; w++)
+//                                std::cout << " " << oldGeneration[i][w];
+//                            std::cout << " value: " << specimenValue;
+//                        }
                         x = 1;
                         temp++;
                     }while(newParents[i][0] == newParents[i][1] || temp <= 0);      // do-while wymusza pierwsze przejscie, temp = 0 zatrzymuje na drugie
@@ -592,7 +616,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
         }
 
 
-        std::cout << "\n krzyzowanie: " << iteration;
+//        std::cout << "\n krzyzowanie: " << iteration;
         switch(mkrzyzowania){
             case '1':{ //OX
                 for(int i = 0; i < ((popChild / 2) + (popChild % 2)); i++)
@@ -812,6 +836,146 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
             }
         }
 
+
+
+        if(mmemetic == '1' || mmemetic == '2')          // algorytm memetyczny
+        {
+            for(int q = 0; q < popChild; q++){          // sprawdzany dla kazdego dziecka
+                tmp = INT_MAX; //Najmniejszy osiagniety przez nas wynik
+//                std::cout << "\n stara sekwencja potomka nr: " << q << "    ";
+//                for(int i = 0; i <= cityamount; i++)
+//                    std::cout << " " << newGeneration[q][i];
+
+                for(int i = 1; i < cityamount-1; i++){
+                    for(int j = i+1; j < cityamount; j++){
+
+                        // wyliczanie roznicy w koszcie, obliczajac jedynie roznice miedzy sciezkami bedacymi czesciami zamienionych miast
+                        if((mmemetic == '2' && (i+1 == j)) || mmemetic == '1'){
+                            tmp2 = distances[newGeneration[q][i-1]][newGeneration[q][j]] + distances[newGeneration[q][j]][newGeneration[q][i]] + distances[newGeneration[q][i]][newGeneration[q][j+1]] - distances[newGeneration[q][i-1]][newGeneration[q][i]] - distances[newGeneration[q][i]][newGeneration[q][j]] - distances[newGeneration[q][j]][newGeneration[q][j+1]];
+//                            std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]]  << " + " << distances[newGeneration[q][j]][newGeneration[q][i]] << " + " << distances[newGeneration[q][i]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][i]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
+                        }
+                        if(mmemetic == '2' && (i+1 != j)){
+                            tmp2 = distances[newGeneration[q][i-1]][newGeneration[q][j]] + distances[newGeneration[q][j]][newGeneration[q][i+1]] + distances[newGeneration[q][j-1]][newGeneration[q][i]] + distances[newGeneration[q][i]][newGeneration[q][j+1]] - distances[newGeneration[q][i-1]][newGeneration[q][i]] - distances[newGeneration[q][i]][newGeneration[q][i+1]] - distances[newGeneration[q][j-1]][newGeneration[q][j]] - distances[newGeneration[q][j]][newGeneration[q][j+1]];
+//                            std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]] << " + " << distances[newGeneration[q][j]][newGeneration[q][i+1]] << " + " << distances[newGeneration[q][j-1]][newGeneration[q][i]] << " + " << distances[newGeneration[q][i]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][i]][newGeneration[q][i+1]] << " - " << distances[newGeneration[q][j-1]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
+                        }
+
+                        if(tmp2 < tmp){                                             //sprawdzenie czy wygenerowany sasiad jest lepszy od juz sprawdzonych
+                            k1 = i;
+                            k2 = j;
+                            tmp = tmp2;
+                        }
+                    }
+                }
+                if(tmp < 0)
+                {
+                    temp = newGeneration[q][k1];                               //zamiana najlepszych miast miejscami
+                    newGeneration[q][k1] = newGeneration[q][k2];
+                    newGeneration[q][k2] = temp;
+//
+//                    if(mmemetic == '1')
+//                        std::cout << "\n zamieniono pozycje miasta na pozycji: " << k1 << " na pozycje " << k2 << " czyli miasta " << newGeneration[q][k2] << " na miasto " << newGeneration[q][k1] << " co pozwolilo nam zmodyfikowac dlugosc trasy o: " << tmp;
+//                    if(mmemetic == '2')
+//                        std::cout << "\n zamieniono miejscami miasta na pozycjach: " << k1 << " oraz " << k2 << " czyli miasta " << newGeneration[q][k2] << " oraz " << newGeneration[q][k1] << " co pozwolilo nam zmodyfikowac dlugosc trasy o: " << tmp;
+//                    std::cout << "\n nowa sekwencja potomka nr: " << q << "    ";
+//                    for(int i = 0; i <= cityamount; i++)
+//                        std::cout << " " << newGeneration[q][i];
+                }
+//                else
+//                    std::cout << "\n nie warto przeprowadzac zadnych zmian.";
+            }
+        }
+
+//        switch(mmemetic){
+//            case '1':{  //insert
+//
+//                for(int q = 0; q < popChild; q++){
+//                    tmp = INT_MAX; //Najmniejszy osiagniety przez nas wynik
+//                    std::cout << "\n stara sekwencja potomka nr: " << q << "    ";
+//                    for(int i = 0; i <= cityamount; i++)
+//                        std::cout << " " << newGeneration[q][i];
+//
+//                    for(int i = 1; i < cityamount-1; i++){
+//                        for(int j = i+1; j < cityamount; j++){
+//
+////                            tmp2 = 0;       // wyliczanie roznicy w koszcie, obliczajac jedynie roznice miedzy sciezkami bedacymi czesciami zamienionych miast
+//                                tmp2 = distances[newGeneration[q][i-1]][newGeneration[q][j]] + distances[newGeneration[q][j]][newGeneration[q][i]] + distances[newGeneration[q][i]][newGeneration[q][j+1]] - distances[newGeneration[q][i-1]][newGeneration[q][i]] - distances[newGeneration[q][i]][newGeneration[q][j]] - distances[newGeneration[q][j]][newGeneration[q][j+1]];
+//                                std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]]  << " + " << distances[newGeneration[q][j]][newGeneration[q][i]] << " + " << distances[newGeneration[q][i]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][i]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
+//
+//
+//                            if(tmp2 < tmp){                                             //sprawdzenie czy wygenerowany sasiad jest lepszy od juz sprawdzonych
+//                                k1 = i;
+//                                k2 = j;
+//                                tmp = tmp2;
+//                            }
+//                        }
+//                    }
+//                    if(tmp < 0)
+//                    {
+//                        temp = newGeneration[q][k1];                               //zamiana najlepszych miast miejscami
+//                        newGeneration[q][k1] = newGeneration[q][k2];
+//                        newGeneration[q][k2] = temp;
+//
+//                        std::cout << "\n zamieniono pozycje miasta na pozycji: " << k1 << " na pozycje " << k2 << " czyli miasta " << newGeneration[q][k2] << " na miasto " << newGeneration[q][k1] << " co pozwolilo nam zmodyfikowac dlugosc trasy o: " << tmp;
+//                        std::cout << "\n nowa sekwencja potomka nr: " << q << "    ";
+//                        for(int i = 0; i <= cityamount; i++)
+//                            std::cout << " " << newGeneration[q][i];
+//                    }
+//                    else
+//                        std::cout << "\n nie warto przeprowadzac zadnych zmian.";
+//                }
+//
+//
+//                break;
+//            }
+//            case '2':{  //swap
+//
+//                for(int q = 0; q < popChild; q++){
+//                    tmp = INT_MAX; //Najmniejszy osiagniety przez nas wynik
+//                    std::cout << "\n stara sekwencja potomka nr: " << q << "    ";
+//                    for(int i = 0; i <= cityamount; i++)
+//                        std::cout << " " << newGeneration[q][i];
+//
+//                    for(int i = 1; i < cityamount-1; i++){
+//                        for(int j = i+1; j < cityamount; j++){
+//
+////                            tmp2 = 0;       // wyliczanie roznicy w koszcie, obliczajac jedynie roznice miedzy sciezkami bedacymi czesciami zamienionych miast
+//                            if(i + 1 == j){
+//                                tmp2 = distances[newGeneration[q][i-1]][newGeneration[q][j]] + distances[newGeneration[q][j]][newGeneration[q][i]] + distances[newGeneration[q][i]][newGeneration[q][j+1]] - distances[newGeneration[q][i-1]][newGeneration[q][i]] - distances[newGeneration[q][i]][newGeneration[q][j]] - distances[newGeneration[q][j]][newGeneration[q][j+1]];
+//                                std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]]  << " + " << distances[newGeneration[q][j]][newGeneration[q][i]] << " + " << distances[newGeneration[q][i]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][i]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
+//                            }
+//                            else{
+//                                tmp2 = distances[newGeneration[q][i-1]][newGeneration[q][j]] + distances[newGeneration[q][j]][newGeneration[q][i+1]] + distances[newGeneration[q][j-1]][newGeneration[q][i]] + distances[newGeneration[q][i]][newGeneration[q][j+1]] - distances[newGeneration[q][i-1]][newGeneration[q][i]] - distances[newGeneration[q][i]][newGeneration[q][i+1]] - distances[newGeneration[q][j-1]][newGeneration[q][j]] - distances[newGeneration[q][j]][newGeneration[q][j+1]];
+//                                std::cout << "\n " << i << "  " << j << "  cost: " << tmp2 << " = " << distances[newGeneration[q][i-1]][newGeneration[q][j]] << " + " << distances[newGeneration[q][j]][newGeneration[q][i+1]] << " + " << distances[newGeneration[q][j-1]][newGeneration[q][i]] << " + " << distances[newGeneration[q][i]][newGeneration[q][j+1]] << " - " << distances[newGeneration[q][i-1]][newGeneration[q][i]] << " - " << distances[newGeneration[q][i]][newGeneration[q][i+1]] << " - " << distances[newGeneration[q][j-1]][newGeneration[q][j]] << " - " << distances[newGeneration[q][j]][newGeneration[q][j+1]];
+//                            }
+//
+//                            if(tmp2 < tmp){                                             //sprawdzenie czy wygenerowany sasiad jest lepszy od juz sprawdzonych
+//                                k1 = i;
+//                                k2 = j;
+//                                tmp = tmp2;
+//                            }
+//                        }
+//                    }
+//                    if(tmp < 0)
+//                    {
+//                        temp = newGeneration[q][k1];                               //zamiana najlepszych miast miejscami
+//                        newGeneration[q][k1] = newGeneration[q][k2];
+//                        newGeneration[q][k2] = temp;
+//
+//                        std::cout << "\n zamieniono miejscami miasta na pozycjach: " << k1 << " oraz " << k2 << " czyli miasta " << newGeneration[q][k2] << " oraz " << newGeneration[q][k1] << " co pozwolilo nam zmodyfikowac dlugosc trasy o: " << tmp;
+//                        std::cout << "\n nowa sekwencja potomka nr: " << q << "    ";
+//                        for(int i = 0; i <= cityamount; i++)
+//                            std::cout << " " << newGeneration[q][i];
+//                    }
+//                    else
+//                        std::cout << "\n nie warto przeprowadzac zadnych zmian.";
+//                }
+//                break;
+//            }
+//        }
+
+
+
+
         switch(mmutacji){
             case '1':{  //insert
                 temp = 100;
@@ -904,10 +1068,10 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                 }
                 break;
             }
-//            case '4':{  //scramble
-//
-//                break;
-//            }
+            case '4':{  //skip mutation
+
+                break;
+            }
             default:{
                 break;
             }
@@ -931,7 +1095,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
             if(childValue[i] < bestCost)
             {
                 bestCost = childValue[i];
-                std::cout << "\n\n newbestpath: " << bestCost;
+//                std::cout << "\n\n newbestpath: " << bestCost;
                 for(int j = 0; j <= cityamount; j++)
                     bestPath[j] = newGeneration[i][j];
             }
@@ -951,7 +1115,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //                std::cout << " " << newGeneration[i][u];
 //            std::cout << " - dziecko nr: " << i << "  droga: " << childValue[i] << "\n";}
 
-        std::cout << "\n selekcja: " << iteration << "\n";
+//        std::cout << "\n selekcja: " << iteration << "\n";
 
 
 
@@ -1038,9 +1202,9 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
                 for(int i = succession; i < popSize + popChild; i++)
                     allPopOperator[i] = i;
 
-                std::cout << "\n";
-                for(int i = 0; i < popChild + popSize; i++)
-                    std::cout << " " << allPopOperator[i];
+//                std::cout << "\n";      //sprawdzenie
+//                for(int i = 0; i < popChild + popSize; i++)
+//                    std::cout << " " << allPopOperator[i];
 
                 for(int i = (popSize + popChild - 1); i > succession; i--)
                 {
@@ -1113,7 +1277,7 @@ int genetical(int kstopu, int maxiteration, int ttime, int popSize, int popChild
 //                    std::cout << " " << bAllPop[i];
                     if(bAllPop[i] == true) temp++;}
                 if(temp != popChild)
-                    std::cout << "\n\n\n\n POPSULEM TURNIEJ!!! \n temp: " << temp << "\n\n\n\n";
+//                    std::cout << "\n\n\n\n POPSULEM TURNIEJ!!! \n temp: " << temp << "\n\n\n\n";
                 break;
             }
 //            case '4':{  //rangowa
@@ -1246,6 +1410,8 @@ int mrowki() //QAS
     double beta = 3; // stopien atrakcyjnosci krotszej sciezki
     int colonySize = cityamount; // wielkosc koloni
     int maxIteration = 100;  //ilosc iteracji programu
+
+
     char choice;
     int tmp = 0;
     int tmp2 = 0;
@@ -1295,7 +1461,25 @@ int mrowki() //QAS
             phTab[i][j] = feromon;                    // poczatkowa ilosc feromonu na kazdej krawedzi
     }
 
-
+//    bool* greedyBool = new bool[cityamount];
+//    for(int i = 0; i < cityamount; i++)
+//        greedyBool[i] = false;
+//    greedyBool[0] = true;
+//
+//
+//    bestPath[0] = bestPath[cityamount] = 0;
+//    for(int i = 0; i < cityamount; i++)        //GreedyAlgoritm
+//    {
+//        tmp = INT_MAX
+//        tmp2 = 0;
+//        for(int j = 0; j < cityamount; j++)
+//        {
+//            if(distances[bestPath[i]][j] < tmp)
+//                tmp = distances[bestPath[i]][j];
+//                j = tmp2;
+//        }
+//
+//    }
 
 
     for(int q = 0; q < maxIteration; q++)
@@ -1416,7 +1600,7 @@ int mrowki() //QAS
             for(int k = 0; k < cityamount; k++)
                 antTabu[j][k] = false;
 
-        std::cout << "\n\n iteracja nr" << q << " zakonczona!\n\n\n";
+        std::cout << "\n iteracja nr" << q << " zakonczona!  Aktualny bestCost = " << bestCost;
     }
 
     std::cout << "\n\n Najlepszy znaleziony wynik: " << bestCost << " zostal otrzymany jako wynik sekwencji: \n";
